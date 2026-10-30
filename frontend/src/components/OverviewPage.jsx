@@ -111,7 +111,7 @@ export default function OverviewPage({ user, courses, progress, setPage, setActi
                 key={c.id}
                 course={c}
                 onClick={() => { setActive(c); setPage('AI Study Assistant'); }}
-                onViewDetail={(course) => { setCourseDetail(course); setPage('Course Detail'); }}
+                onViewDetail={(course) => { setActive(course); setCourseDetail(course); setPage('Course Detail'); }}
               />
             ))}
           </div>

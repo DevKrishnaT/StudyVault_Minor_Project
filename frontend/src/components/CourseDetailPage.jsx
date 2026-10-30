@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { BookOpen, BrainCircuit, FileText, Loader, Sparkles, Target, Users, Zap, ChevronDown, ChevronUp, Clock, BarChart2, Star } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { BookOpen, BrainCircuit, FileText, Loader, Sparkles, Target, Users, Zap, ChevronDown, ChevronUp, Clock, BarChart2, Star, X } from 'lucide-react';
 import { api, json } from '../api';
 
 const TOPICS = ['Introduction & Overview', 'Core Concepts', 'Fundamentals', 'Advanced Topics', 'Practical Applications', 'Case Studies', 'Review & Assessment'];
@@ -44,6 +44,32 @@ export default function CourseDetailPage({ course, notes, onStudy, onPractice, s
   const [loadingSyllabus, setLoadingSyllabus] = useState(false);
   const [syllabusError, setSyllabusError] = useState('');
   const [tab, setTab] = useState('overview');
+  const [selectedMaterial, setSelectedMaterial] = useState(null);
+  const [loadingMaterial, setLoadingMaterial] = useState(false);
+  const [materialError, setMaterialError] = useState('');
+  const materialRequestId = useRef(0);
+
+  async function openMaterial(note) {
+    const requestId = ++materialRequestId.current;
+    setSelectedMaterial(note);
+    setLoadingMaterial(true);
+    setMaterialError('');
+    try {
+      const material = await api(`/courses/${course.id}/notes/${note.id}`);
+      if (materialRequestId.current === requestId) setSelectedMaterial(material);
+    } catch (e) {
+      if (materialRequestId.current === requestId) setMaterialError(e.message);
+    } finally {
+      if (materialRequestId.current === requestId) setLoadingMaterial(false);
+    }
+  }
+
+  function closeMaterial() {
+    materialRequestId.current += 1;
+    setSelectedMaterial(null);
+    setLoadingMaterial(false);
+    setMaterialError('');
+  }
 
   async function generateSyllabus() {
     setLoadingSyllabus(true);
@@ -218,14 +244,14 @@ export default function CourseDetailPage({ course, notes, onStudy, onPractice, s
           {notes.length ? (
             <div className="materials-list">
               {notes.map(n => (
-                <div className="material-card" key={n.id}>
+                <button className="material-card" key={n.id} onClick={() => openMaterial(n)}>
                   <div className="material-icon"><FileText size={20} /></div>
                   <div className="material-info">
                     <b>{n.title}</b>
                     <small>{n.original_name} · {new Date(n.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</small>
                   </div>
-                  <span className="indexed-badge">Indexed</span>
-                </div>
+                  <span className="indexed-badge">Open material</span>
+                </button>
               ))}
             </div>
           ) : (
@@ -236,6 +262,35 @@ export default function CourseDetailPage({ course, notes, onStudy, onPractice, s
               <button className="primary" style={{ marginTop: 14 }} onClick={() => setPage('Notes & Files')}>Upload Notes</button>
             </div>
           )}
+        </div>
+      )}
+
+      {selectedMaterial && (
+        <div className="material-modal-backdrop" onClick={closeMaterial}>
+          <section
+            className="material-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="material-modal-title"
+            onClick={e => e.stopPropagation()}
+          >
+            <header className="material-modal-header">
+              <div>
+                <h3 id="material-modal-title">{selectedMaterial.title}</h3>
+                <p className="muted">{selectedMaterial.original_name}</p>
+              </div>
+              <button className="icon-btn" onClick={closeMaterial} aria-label="Close material">
+                <X size={18} />
+              </button>
+            </header>
+            {materialError ? (
+              <div className="error-banner">{materialError}</div>
+            ) : loadingMaterial ? (
+              <div className="material-loading"><Loader size={18} className="spin" /> Loading material…</div>
+            ) : (
+              <pre className="material-content">{selectedMaterial.content}</pre>
+            )}
+          </section>
         </div>
       )}
     </div>

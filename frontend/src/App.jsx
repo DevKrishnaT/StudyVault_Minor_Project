@@ -54,10 +54,18 @@ export default function App() {
   useEffect(() => { if (token) load(); }, [token]);
 
   useEffect(() => {
-    if (!token || !active) return;
-    api(`/courses/${active.id}/notes`).then(setNotes).catch(() => {});
+    if (!token || !active) {
+      setNotes([]);
+      return;
+    }
+    let current = true;
+    setNotes([]);
+    api(`/courses/${active.id}/notes`)
+      .then(data => { if (current) setNotes(data); })
+      .catch(() => { if (current) setNotes([]); });
     api(`/courses/${active.id}/quizzes`).then(setQuizzes).catch(() => {});
     api(`/courses/${active.id}/forum`).then(setPosts).catch(() => {});
+    return () => { current = false; };
   }, [token, active?.id]);
 
   async function authenticate(mode, form) {
@@ -174,10 +182,20 @@ export default function App() {
           <CourseCatalogPage
             user={user}
             setPage={setPage}
-            setSelectedCourseId={(id) => {
-              const found = courses.find(c => c.id === id);
-              if (found) { setActive(found); setCourseDetail(found); setPage('Course Detail'); }
-              else { enrollCourse(id).then(() => setPage('My Courses')); }
+            setSelectedCourseId={async (id) => {
+              let found = courses.find(c => c.id === id);
+              if (!found) {
+                const refreshedCourses = await api('/courses');
+                setCourses(refreshedCourses);
+                found = refreshedCourses.find(c => c.id === id);
+              }
+              if (!found) {
+                flash('Enroll in this course before opening it.', 'error');
+                return;
+              }
+              setActive(found);
+              setCourseDetail(found);
+              setPage('Course Detail');
             }}
           />
         )}

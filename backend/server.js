@@ -137,6 +137,21 @@ app.get("/api/courses/:id/notes", auth, async (req, res) => {
   res.json(rows);
 });
 
+app.get("/api/courses/:id/notes/:noteId", auth, async (req, res) => {
+  const [rows] = await pool.execute(
+    `SELECT n.id,n.title,n.original_name,n.content,n.created_at
+     FROM notes n
+     JOIN courses c ON c.id=n.course_id
+     WHERE n.id=? AND n.course_id=?
+       AND (c.created_by=? OR EXISTS(
+         SELECT 1 FROM enrollments e WHERE e.course_id=c.id AND e.user_id=?
+       ))`,
+    [req.params.noteId, req.params.id, req.user.id, req.user.id]
+  );
+  if (!rows[0]) return res.status(404).json({ error: "Material not found" });
+  res.json(rows[0]);
+});
+
 app.post("/api/courses/:id/notes", auth, upload.single("file"), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: "Choose a .txt or .md file" });

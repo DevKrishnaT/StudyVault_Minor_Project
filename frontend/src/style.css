@@ -581,8 +581,14 @@ textarea { resize: vertical; min-height: 90px; }
 .subtopic-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--purple-mid); flex-shrink: 0; margin-top: 6px; }
 .syllabus-objectives { margin-top: 14px; padding: 12px; background: var(--purple-light); border-radius: 8px; font-size: 12px; color: #4a3f9e; line-height: 1.7; }
 .materials-list { display: grid; gap: 10px; }
-.material-card { display: flex; align-items: center; gap: 14px; padding: 16px; background: #fff; border: 1px solid var(--border); border-radius: 12px; transition: var(--transition); }
+.material-card { display: flex; align-items: center; gap: 14px; padding: 16px; width: 100%; text-align: left; color: inherit; background: #fff; border: 1px solid var(--border); border-radius: 12px; transition: var(--transition); }
 .material-card:hover { border-color: #d4ceff; box-shadow: var(--shadow-sm); }
+.material-modal-backdrop { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; padding: 24px; background: rgba(25, 27, 52, .55); }
+.material-modal { display: flex; flex-direction: column; width: min(760px, 100%); max-height: min(85vh, 900px); padding: 22px; background: #fff; border-radius: 16px; box-shadow: var(--shadow-lg); }
+.material-modal-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+.material-modal-header .muted { margin-top: 5px; }
+.material-loading { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 180px; color: var(--text-muted); font-size: 13px; }
+.material-content { overflow: auto; margin: 0; padding: 18px 2px 2px; color: #3b3e5a; font: 13px/1.75 Inter, sans-serif; white-space: pre-wrap; overflow-wrap: anywhere; }
 .material-icon { width: 44px; height: 50px; background: var(--purple-light); color: var(--purple); border-radius: 10px; display: grid; place-items: center; flex-shrink: 0; }
 .material-info { flex: 1; display: grid; gap: 4px; }
 .material-info b { font-size: 13px; color: #1e2140; }
@@ -766,7 +772,7 @@ textarea { resize: vertical; min-height: 90px; }
   transition: filter .2s, transform .15s; border: 0; cursor: pointer; margin-top: auto;
 }
 .catalog-enroll-btn:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-1px); }
-.catalog-enroll-btn.enrolled { background: #e9f3ff; color: #4a7de8; cursor: default; }
+.catalog-enroll-btn.enrolled { background: #e9f3ff; color: #4a7de8; cursor: pointer; }
 
 /* Loading skeletons */
 .catalog-loading { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }

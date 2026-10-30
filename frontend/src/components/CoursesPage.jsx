@@ -83,7 +83,7 @@ export default function CoursesPage({ user, courses, active, setActive, setPage,
               key={c.id}
               course={c}
               onClick={() => { setActive(c); setPage('AI Study Assistant'); }}
-              onViewDetail={(course) => { setCourseDetail(course); setPage('Course Detail'); }}
+              onViewDetail={(course) => { setActive(course); setCourseDetail(course); setPage('Course Detail'); }}
             />
           ))}
         </div>

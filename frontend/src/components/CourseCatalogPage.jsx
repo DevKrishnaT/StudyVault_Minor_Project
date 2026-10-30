@@ -99,7 +99,7 @@ function StarRating({ rating }) {
   );
 }
 
-function CourseCard({ course, onEnroll, enrolling }) {
+function CourseCard({ course, onEnroll, onOpen, enrolling }) {
   const palette = CARD_PALETTES[course.thumbnail_color] || CARD_PALETTES.purple;
   const diff = DIFF_COLORS[course.difficulty] || DIFF_COLORS.Beginner;
   const icon = ICONS[course.thumbnail_icon] || ICONS.BookOpen;
@@ -134,20 +134,28 @@ function CourseCard({ course, onEnroll, enrolling }) {
           <span>📝 {course.quiz_count || 0} quizzes</span>
         </div>
 
-        <button
-          className={`catalog-enroll-btn ${course.is_enrolled ? 'enrolled' : ''}`}
-          onClick={() => !course.is_enrolled && onEnroll(course.id)}
-          disabled={course.is_enrolled || enrolling === course.id}
-          style={{ '--btn-color': palette.from }}
-        >
-          {enrolling === course.id ? (
-            <><span className="spin" style={{ display: 'inline-block', width: 14, height: 14, border: '2px solid #fff', borderTopColor: 'transparent', borderRadius: '50%' }} /> Enrolling...</>
-          ) : course.is_enrolled ? (
-            <>✓ Already Enrolled</>
-          ) : (
-            <>Enroll Free →</>
-          )}
-        </button>
+        {course.is_enrolled ? (
+          <button
+            className="catalog-enroll-btn enrolled"
+            onClick={() => onOpen(course.id)}
+            style={{ '--btn-color': palette.from }}
+          >
+            Open Course →
+          </button>
+        ) : (
+          <button
+            className="catalog-enroll-btn"
+            onClick={() => onEnroll(course.id)}
+            disabled={enrolling === course.id}
+            style={{ '--btn-color': palette.from }}
+          >
+            {enrolling === course.id ? (
+              <><span className="spin" style={{ display: 'inline-block', width: 14, height: 14, border: '2px solid #fff', borderTopColor: 'transparent', borderRadius: '50%' }} /> Enrolling...</>
+            ) : (
+              <>Enroll Free →</>
+            )}
+          </button>
+        )}
       </div>
     </div>
   );
@@ -278,7 +286,7 @@ export default function CourseCatalogPage({ user, setPage, setSelectedCourseId }
       ) : (
         <div className="catalog-grid">
           {filtered.map(course => (
-            <CourseCard key={course.id} course={course} onEnroll={handleEnroll} enrolling={enrolling} />
+            <CourseCard key={course.id} course={course} onEnroll={handleEnroll} onOpen={setSelectedCourseId} enrolling={enrolling} />
           ))}
         </div>
       )}
