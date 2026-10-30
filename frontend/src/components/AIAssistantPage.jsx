@@ -54,24 +54,100 @@ function MessageBubble({ msg, user }) {
 }
 
 function formatMessage(text) {
-  // Simple markdown-like formatting
   const lines = text.split('\n');
+  const blocks = [];
+  let listItems = [];
+  let listType = null;
+  let codeLines = null;
+
+  const flushList = () => {
+    if (!listItems.length) return;
+    const List = listType === 'ordered' ? 'ol' : 'ul';
+    blocks.push(
+      <List key={`list-${blocks.length}`}>
+        {listItems.map((item, index) => <li key={index}>{formatInline(item)}</li>)}
+      </List>
+    );
+    listItems = [];
+    listType = null;
+  };
+
+  const flushCode = () => {
+    blocks.push(<pre key={`code-${blocks.length}`}><code>{codeLines.join('\n')}</code></pre>);
+    codeLines = null;
+  };
+
+  lines.forEach((line, index) => {
+    if (codeLines) {
+      if (/^\s*```/.test(line)) flushCode();
+      else codeLines.push(line);
+      return;
+    }
+
+    if (/^\s*```/.test(line)) {
+      flushList();
+      codeLines = [];
+      return;
+    }
+
+    const heading = line.match(/^\s*(#{1,6})\s+(.+?)\s*#*\s*$/);
+    if (heading) {
+      flushList();
+      const level = heading[1].length;
+      const Heading = `h${level}`;
+      blocks.push(<Heading className="markdown-heading" key={index}>{formatInline(heading[2])}</Heading>);
+      return;
+    }
+
+    const ordered = line.match(/^\s*\d+[.)]\s+(.+)$/);
+    const unordered = line.match(/^\s*(?:[-*+] |• )(.+)$/);
+    if (ordered || unordered) {
+      const type = ordered ? 'ordered' : 'unordered';
+      if (listType && listType !== type) flushList();
+      listType = type;
+      listItems.push((ordered || unordered)[1]);
+      return;
+    }
+
+    flushList();
+    if (!line.trim()) {
+      blocks.push(<br key={index} />);
+      return;
+    }
+
+    const quote = line.match(/^\s*>\s?(.*)$/);
+    if (quote) {
+      blocks.push(<blockquote key={index}>{formatInline(quote[1])}</blockquote>);
+      return;
+    }
+
+    blocks.push(<p key={index}>{formatInline(line)}</p>);
+  });
+
+  flushList();
+  if (codeLines) flushCode();
+
   return (
     <div className="msg-content">
-      {lines.map((line, i) => {
-        if (line.startsWith('**') && line.endsWith('**')) {
-          return <p key={i}><strong>{line.slice(2, -2)}</strong></p>;
-        }
-        if (line.startsWith('• ') || line.startsWith('- ')) {
-          return <p key={i} className="bullet">• {line.slice(2)}</p>;
-        }
-        if (line.match(/^\d+\./)) {
-          return <p key={i} className="numbered">{line}</p>;
-        }
-        return line ? <p key={i}>{line}</p> : <br key={i} />;
-      })}
+      {blocks}
     </div>
   );
+}
+
+function formatInline(text) {
+  const parts = text.split(/(\*\*.+?\*\*|__.+?__|`[^`]+`|\*[^*]+?\*|_[^_]+?_)/g);
+  return parts.map((part, index) => {
+    if ((part.startsWith('**') && part.endsWith('**')) || (part.startsWith('__') && part.endsWith('__'))) {
+      return <strong key={index}>{part.slice(2, -2)}</strong>;
+    }
+    if (part.startsWith('`') && part.endsWith('`')) {
+      return <code key={index}>{part.slice(1, -1)}</code>;
+    }
+    if ((part.startsWith('*') && part.endsWith('*')) || (part.startsWith('_') && part.endsWith('_'))) {
+      return <em key={index}>{part.slice(1, -1)}</em>;
+    }
+    return part;
+  });
 }
 
 export default function AIAssistantPage({ active, courses, setActive, notes, user, chat, setChat, question, setQuestion, busy, setBusy, ask }) {
