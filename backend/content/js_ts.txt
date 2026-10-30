@@ -1,0 +1,223 @@
+JAVASCRIPT AND TYPESCRIPT ADVANCED - COMPLETE COURSE NOTES
+
+CHAPTER 1: JAVASCRIPT INTERNALS
+
+Execution Context:
+Environment where JavaScript code runs. Contains variable environment, scope chain, this.
+Types: Global (window in browser, global in Node), Function (created when function is called), Eval.
+Creation phase: hoisting (var and function declarations moved to top). Execution phase: code runs.
+
+Call Stack:
+LIFO data structure tracking function calls.
+When function is called, pushed to stack. When returns, popped from stack.
+Stack overflow: too many nested calls (recursive without base case).
+Single-threaded: only one thing runs at a time.
+
+Hoisting:
+var declarations hoisted and initialized with undefined.
+let and const hoisted but NOT initialized (temporal dead zone - accessing before declaration throws ReferenceError).
+Function declarations hoisted completely (name and body). Can call before declaration.
+Function expressions and arrow functions: only variable name hoisted (as undefined).
+
+Closures:
+Function has access to variables from outer scope even after outer function returned.
+Inner function closes over outer scope variables.
+Practical uses: data encapsulation, function factories, memoization, event handlers.
+Memory: closure keeps outer scope alive as long as closure exists.
+Counter example: factory function returns function that increments private count variable.
+
+Prototype and Prototype Chain:
+Every object has hidden prototype property (accessed as __proto__).
+When property accessed, JS looks on object first, then up prototype chain.
+Object.prototype is top of chain (has toString, hasOwnProperty etc.).
+Constructor functions: new creates object with prototype pointing to Constructor.prototype.
+class syntax is syntactic sugar over prototype-based inheritance.
+Object.create(proto) creates object with specified prototype.
+instanceof checks if object has constructor.prototype in its prototype chain.
+
+this keyword:
+Value depends on how function is called (not where defined, except arrow functions).
+Regular function: this = caller object. Standalone call: this = window or undefined (strict mode).
+Arrow function: inherits this from enclosing scope at definition time. Cannot be changed.
+Explicit binding: call(thisArg, args), apply(thisArg, [args]), bind(thisArg) returns new function.
+Class method: this = instance when called as method. Beware losing context in callbacks.
+Event handler: this = element that triggered event.
+
+CHAPTER 2: ASYNCHRONOUS JAVASCRIPT
+
+Event Loop:
+JavaScript is single-threaded but handles async operations via event loop.
+Call Stack: synchronous code execution.
+Web APIs (browser) or C++ APIs (Node): handle async operations (setTimeout, fetch, I/O).
+Callback Queue (Task Queue): callbacks from setTimeout, setInterval, I/O.
+Microtask Queue: Promise callbacks, queueMicrotask. Higher priority than callback queue.
+Event Loop: when call stack empty, check microtask queue first, then callback queue.
+
+Promise:
+Object representing eventual completion or failure of async operation.
+States: Pending, Fulfilled (resolved with value), Rejected (with reason).
+Immutable once settled.
+
+Creating Promises:
+new Promise((resolve, reject) => { resolve(value) or reject(error) }).
+Promisifying: convert callback-based API to Promise.
+
+Promise chaining:
+then() receives resolved value, returns new Promise.
+catch() handles rejection anywhere in chain.
+finally() runs regardless of outcome.
+Each then() returns a new Promise. Chain them sequentially.
+
+Async/Await:
+async function always returns Promise.
+await pauses execution inside async function until Promise settles.
+Makes async code look synchronous.
+await can only be used inside async function (or top-level module).
+Error handling: try/catch around await.
+
+Parallel execution:
+Sequential: await one then await another. Slow if independent.
+Parallel: const [a, b] = await Promise.all([fetch1, fetch2]). Faster.
+Promise.allSettled: get all results even if some failed.
+Promise.race: first one wins. Use for timeouts.
+Promise.any: first success wins.
+
+Common mistakes:
+Forgetting await (get Promise instead of value).
+Not handling Promise rejection (unhandledRejection).
+Running promises sequentially when they could be parallel.
+async in forEach (does not work as expected, use for...of or Promise.all with map).
+
+Generators:
+function* defines generator function. Returns iterator.
+yield pauses generator and returns value.
+next() resumes generator, returns { value, done }.
+Can be used for lazy sequences, infinite iterators.
+async generators combine async and generator features.
+
+CHAPTER 3: TYPESCRIPT FUNDAMENTALS
+
+Why TypeScript:
+JavaScript with static types. Catches errors at compile time.
+Better IDE support (autocomplete, refactoring). Self-documenting code.
+Compiled to plain JavaScript. Zero runtime overhead.
+Superset: all valid JavaScript is valid TypeScript.
+
+Basic Types:
+string, number, boolean, null, undefined, void, never, any, unknown.
+any: opt out of type checking (avoid). unknown: type-safe alternative to any.
+never: function that never returns (throws or infinite loop). Exhaustive checks.
+void: function with no return value.
+
+Type Annotations:
+let name: string = "Alice"
+function greet(name: string): string { return "Hello " + name }
+Variable type often inferred automatically.
+
+Arrays and Tuples:
+number[] or Array<number> for arrays.
+[string, number] tuple: fixed length, specific types per position.
+
+Objects and Interfaces:
+interface User { name: string; age: number; email?: string }
+Optional with ?. Readonly with readonly.
+Index signatures: { [key: string]: any }
+interface vs type: both work, interfaces support declaration merging.
+
+Union and Intersection Types:
+Union: string | number means either type. Use with typeof narrowing.
+Intersection: TypeA & TypeB means has all properties of both.
+Discriminated unions: interface with literal type field used in switch for type narrowing.
+
+Generics:
+Write reusable code that works with multiple types.
+function identity<T>(arg: T): T { return arg }
+Array<T>, Promise<T>, Map<K,V> use generics.
+Constraints: function<T extends Serializable>
+
+Type Guards and Narrowing:
+typeof, instanceof, in operator narrow types in conditionals.
+Custom type guards: function isUser(x: any): x is User { return 'name' in x }
+Discriminated union with switch on kind or type field.
+
+Utility Types:
+Partial<T>: all properties optional.
+Required<T>: all properties required.
+Readonly<T>: all properties readonly.
+Pick<T, 'a' | 'b'>: only include listed properties.
+Omit<T, 'password'>: exclude listed properties.
+Record<K, V>: object with keys K and values V.
+Exclude<T, U>: exclude types from union.
+ReturnType<typeof fn>: get return type of function.
+
+Enums:
+Numeric enum: enum Direction { Up, Down, Left, Right } (values 0,1,2,3).
+String enum: enum Status { Active = 'ACTIVE', Inactive = 'INACTIVE' }
+Prefer string enums for readability. Consider union types instead.
+
+Decorators:
+Special syntax @decorator for annotating classes, methods, properties.
+Used extensively in Angular, NestJS.
+Metadata programming. Not stable in TS yet (experimental flag needed).
+
+tsconfig.json:
+strict: true enables all strict checks (recommended).
+target: compilation output (es2020, es2015).
+module: module system (commonjs, esnext).
+outDir: compiled output directory.
+include and exclude for file patterns.
+
+CHAPTER 4: MODERN PATTERNS AND TOOLS
+
+Design Patterns in JavaScript:
+Module Pattern: use ES modules or IIFE for encapsulation.
+Observer Pattern: event emitters, publish-subscribe. Multiple listeners for events.
+Singleton: one instance of class throughout application. Module-level variable.
+Factory: function that creates objects without new keyword.
+Strategy: swap algorithms at runtime.
+Decorator Pattern: add behavior to objects. Higher-order functions.
+
+Module Bundlers:
+Vite: blazing fast dev server with native ES modules. Rollup for production build.
+Webpack: mature, highly configurable. Used in Create React App, Angular.
+esbuild: extremely fast Go-based bundler.
+Configuration: entry point, output path, loaders (transform files), plugins.
+Tree shaking: remove unused code. Code splitting: split into chunks for lazy loading.
+
+Package Management:
+npm: default Node package manager. package.json for dependencies.
+yarn: alternative. pnpm: fast, disk-efficient.
+Semantic versioning: MAJOR.MINOR.PATCH. Caret ^ allows minor/patch updates.
+Lock files: package-lock.json or yarn.lock pin exact versions.
+npm scripts: test, build, dev in scripts section.
+
+Linting and Formatting:
+ESLint: JavaScript linter. Enforce code quality rules. Plugins for React, TypeScript.
+Prettier: opinionated code formatter. Consistent formatting across team.
+ESLint config: .eslintrc.json with rules and extends.
+Prettier config: .prettierrc with options.
+Combine: ESLint for code quality, Prettier for formatting. eslint-config-prettier to avoid conflicts.
+
+Testing:
+Jest: popular testing framework. Works for unit and integration tests.
+Vitest: Vite-native testing. Compatible with Jest API. Much faster.
+test() or it() for test cases. describe() for grouping.
+expect(value).toBe(), toEqual(), toBeNull(), toHaveBeenCalled() matchers.
+beforeEach, afterEach, beforeAll, afterAll hooks.
+Mock functions: jest.fn(). Mock modules: jest.mock('./module').
+Testing React: React Testing Library. test user behavior not implementation.
+
+Performance Optimization:
+Lazy loading: import() for dynamic imports. React.lazy for components.
+Debouncing: delay function until after events stop (search input).
+Throttling: limit function to once per time period (scroll handler).
+Memoization: cache function results. useMemo in React.
+Web Workers: run JavaScript on background thread. For CPU-heavy tasks.
+requestAnimationFrame: for smooth animations.
+Lighthouse: Google tool for performance audit.
+
+Promises and Error handling patterns:
+Always handle rejections. Global handler for unhandledRejection.
+Early return pattern for errors. Result type pattern (like Rust) with { data, error }.
+Retry logic with exponential backoff for network requests.
+Circuit breaker pattern: stop calling failing service temporarily.

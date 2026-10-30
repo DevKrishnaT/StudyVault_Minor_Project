@@ -1,0 +1,183 @@
+SYSTEM DESIGN AND ARCHITECTURE - COMPLETE COURSE NOTES
+
+CHAPTER 1: SYSTEM DESIGN FUNDAMENTALS
+
+System design is the process of defining components, modules, interfaces, and data flow for a system to satisfy specific requirements. It is a critical skill for senior engineers and technical interviews.
+
+Scalability:
+Ability of system to handle growing amount of work.
+Vertical scaling (scale up): add more CPU, RAM, storage to one server. Has hardware limits.
+Horizontal scaling (scale out): add more servers. Distribute load across machines. Preferred for large scale.
+
+Key Metrics:
+Latency: time to complete a single request (milliseconds).
+Throughput: number of requests system can handle per unit time (requests per second).
+Availability: percentage of time system is operational. 99.9% = 8.7 hours downtime per year. 99.99% = 52 minutes per year.
+Durability: data survives failures. Achieved with replication and backups.
+
+CAP Theorem:
+A distributed system can only guarantee two of three:
+Consistency (C): every read returns most recent write or error.
+Availability (A): every request receives a response (not guaranteed to be most recent).
+Partition Tolerance (P): system operates despite network partitions.
+Since network partitions can always happen, real systems choose between CP and AP.
+
+PACELC extension: even without partition, there is tradeoff between latency and consistency.
+
+SLA and SLO:
+SLA (Service Level Agreement): contract with users about performance guarantees.
+SLO (Service Level Objective): internal target metrics.
+SLI (Service Level Indicator): actual measured metrics.
+
+CHAPTER 2: LOAD BALANCING AND CACHING
+
+Load Balancers:
+Distribute incoming traffic across multiple servers.
+Prevents any single server from being overwhelmed.
+Types: hardware (F5), software (HAProxy, Nginx), cloud (AWS ALB, GCP Cloud Load Balancer).
+Layer 4 (Transport): routes based on IP and TCP/UDP port. Faster but less intelligent.
+Layer 7 (Application): routes based on HTTP content (URL, headers, cookies). More flexible.
+
+Load Balancing Algorithms:
+Round Robin: distribute requests equally in rotation. Good for identical servers.
+Weighted Round Robin: servers with more capacity get more requests.
+Least Connections: send to server with fewest active connections. Good for varying request durations.
+IP Hash: same client always goes to same server (session persistence).
+Random: random selection. Simple and surprisingly effective.
+
+Health Checks:
+Load balancer periodically checks server health.
+Remove unhealthy servers from pool. Add back when healthy.
+Active checks: LB sends ping or request. Passive checks: monitor actual traffic.
+
+Caching:
+Store frequently accessed data in fast storage to reduce latency and database load.
+Cache hit: data found in cache. Cache miss: must fetch from source.
+Cache hit ratio: hit / (hit + miss). Higher is better.
+
+Cache Strategies:
+Cache-Aside (Lazy Loading): application checks cache first. On miss, loads from DB and stores in cache.
+Write-Through: write to cache and DB simultaneously. Consistent but slower writes.
+Write-Behind (Write-Back): write to cache, async write to DB. Fast writes, risk of data loss.
+Read-Through: cache handles DB reads automatically.
+
+Redis:
+In-memory data store. Sub-millisecond latency.
+Data types: strings, lists, sets, sorted sets, hashes, streams.
+Pub/Sub for messaging. Persistent storage options.
+Cluster mode for horizontal scaling. Sentinel for high availability.
+Use cases: session storage, rate limiting, leaderboard (sorted sets), caching.
+
+CDN (Content Delivery Network):
+Geographically distributed servers that cache static content.
+Users served from nearest edge server. Reduces latency.
+Types: Push CDN (push content to edges proactively), Pull CDN (cache on first request).
+Examples: CloudFront, Fastly, Cloudflare.
+Use for: static assets (images, CSS, JS), videos, large file downloads.
+
+CHAPTER 3: DATABASES AT SCALE
+
+Database Replication:
+Master-Slave (Primary-Replica): writes go to primary, reads from replicas.
+Increases read throughput. Replicas can be in different regions.
+Asynchronous replication: primary does not wait for replica confirmation. Possible data loss.
+Synchronous replication: wait for replica confirmation. Slower writes, no data loss.
+Multi-Master: multiple primaries, handles conflicts. More complex.
+
+Database Sharding:
+Horizontal partitioning: split rows across multiple databases (shards).
+Each shard is an independent database with subset of data.
+Sharding strategies:
+Hash sharding: hash(key) % num_shards. Even distribution but resharding is hard.
+Range sharding: shard based on value ranges. Easy range queries but hotspots possible.
+Directory sharding: lookup table maps keys to shards. Flexible but lookup table is bottleneck.
+
+Challenges: cross-shard queries and transactions, resharding, joins across shards.
+
+Consistent Hashing:
+Better hashing strategy for distributed systems.
+Arrange servers on a ring. Each key maps to nearest server clockwise.
+Adding/removing servers only affects neighbors on ring. Minimizes data movement.
+Virtual nodes: each server appears multiple times on ring. Better balance.
+
+CAP in practice:
+MySQL: CP (consistency over availability in partitions).
+MongoDB: CP by default, tunable consistency levels.
+Cassandra: AP (availability, eventual consistency).
+DynamoDB: tunable CP or AP per request.
+
+CHAPTER 4: MICROSERVICES AND APIS
+
+Monolith vs Microservices:
+Monolith: single deployable unit. Simple to develop initially, but hard to scale and maintain as it grows.
+Microservices: application split into small independent services. Each has own database.
+Each service: independently deployable, scalable, has single responsibility.
+
+Advantages of microservices:
+Independent deployment: update one service without deploying all.
+Independent scaling: scale only busy services.
+Technology flexibility: different languages per service.
+Fault isolation: one service failure does not crash entire system.
+
+Disadvantages:
+Distributed system complexity. Network latency. Data consistency challenges.
+Harder to test end-to-end. Requires mature DevOps infrastructure.
+
+Communication between services:
+Synchronous: REST API, gRPC. Direct request-response. Simple but tight coupling.
+Asynchronous: Message queues (RabbitMQ, Kafka). Producer sends message, consumer processes later.
+Event-driven: services communicate via events. Loose coupling.
+
+API Gateway:
+Single entry point for all client requests.
+Handles: routing, authentication, rate limiting, SSL termination, load balancing.
+Examples: AWS API Gateway, Kong, Nginx.
+Prevents clients from knowing internal service structure.
+
+Service Discovery:
+Services need to find each other dynamically (IPs change with auto-scaling).
+Client-side discovery: client queries service registry (Eureka, Consul).
+Server-side discovery: load balancer queries registry.
+
+Message Queues:
+Decouple producers from consumers. Buffer for handling traffic spikes.
+Kafka: distributed log. High throughput. Topics with partitions. Consumers in groups.
+Kafka use cases: event streaming, log aggregation, activity tracking.
+RabbitMQ: traditional message broker. AMQP protocol. Routing patterns.
+
+CHAPTER 5: DESIGNING REAL SYSTEMS
+
+URL Shortener (like bit.ly):
+Requirements: given long URL, generate short URL. Redirect short URL to long URL.
+Storage: map short codes to long URLs. MySQL or Redis (with expiration).
+Short code generation: hash long URL (MD5 or SHA256), take first 6-8 chars.
+Handle collisions: if code exists, try different hash or append counter.
+Scale: cache popular URLs in Redis. CDN for redirect responses.
+Estimations: 100M URLs, 500B per URL = 50GB. 100:1 read:write ratio.
+
+Twitter Feed (Newsfeed):
+Two approaches: Push (fanout on write) or Pull (fanout on read).
+Push: when user tweets, push to followers' feeds. Fast reads, expensive writes for celebrities.
+Pull: compute feed on read by fetching all followee tweets and merging. Expensive reads.
+Hybrid: push for normal users, pull for celebrities (too many followers to push).
+Cache feed in Redis as sorted set. Paginate with cursor.
+
+YouTube Video Streaming:
+Upload: chunked upload to blob storage (S3). Process video asynchronously.
+Transcoding: convert to multiple resolutions (360p, 720p, 1080p, 4K) using message queue.
+Storage: video in S3/GCS, metadata in MySQL, comments in Cassandra.
+Streaming: adaptive bitrate streaming (HLS, DASH). Deliver via CDN.
+Search: Elasticsearch for video search. Thumbnails on CDN.
+
+Rate Limiting:
+Prevent abuse and ensure fair usage.
+Algorithms: Token Bucket (requests consume tokens, tokens refill over time), Leaky Bucket (constant output rate), Fixed Window Counter, Sliding Window.
+Implementation: Redis with counters per user/IP. Lua scripts for atomic operations.
+Response: 429 Too Many Requests status code with Retry-After header.
+
+Notification System:
+Sources: multiple services send events.
+Queue: events go to message queue for reliability.
+Workers: process events, apply user preferences and quiet hours.
+Delivery channels: push notifications (APNs, FCM), email (SendGrid), SMS (Twilio).
+Retry logic for failures. Track delivery status.

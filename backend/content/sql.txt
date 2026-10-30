@@ -1,0 +1,244 @@
+DATABASE DESIGN AND SQL - COMPLETE COURSE NOTES
+
+CHAPTER 1: RELATIONAL DATABASE CONCEPTS
+
+A database is an organized collection of structured data. A Relational Database stores data in tables with rows and columns and supports relationships between tables.
+
+Key components:
+Table (Relation): organized into rows and columns. Like a spreadsheet.
+Row (Tuple/Record): single data entry. Each row is one instance.
+Column (Attribute): single field. Each column has a name and data type.
+Schema: blueprint of database structure. Defines tables, columns, types, constraints.
+
+Data Types in MySQL:
+INT, BIGINT, TINYINT: integers of different sizes.
+DECIMAL(m,d): exact decimal. FLOAT, DOUBLE: floating point (not for money).
+VARCHAR(n): variable-length string up to n chars. CHAR(n): fixed-length string.
+TEXT, LONGTEXT: for large text data.
+DATE, TIME, DATETIME, TIMESTAMP: date and time values.
+BOOLEAN or TINYINT(1): true or false.
+JSON: store JSON documents.
+ENUM: value must be from list of allowed values.
+
+Constraints:
+PRIMARY KEY: uniquely identifies each row. Cannot be null. Usually auto-increment integer.
+UNIQUE: all values in column must be distinct. Can be null (unless NOT NULL added).
+NOT NULL: value cannot be null.
+FOREIGN KEY: value must exist in another table's primary key. Maintains referential integrity.
+CHECK: value must satisfy condition.
+DEFAULT: provides default value if none given.
+INDEX: not a constraint, improves query performance.
+
+ACID Properties (ensure data reliability):
+Atomicity: transaction is all-or-nothing. Either fully completes or fully rolls back.
+Consistency: transaction brings database from one valid state to another.
+Isolation: concurrent transactions do not interfere with each other.
+Durability: committed transactions persist even after system failure.
+
+Transactions:
+BEGIN or START TRANSACTION to start.
+COMMIT to save changes permanently.
+ROLLBACK to undo changes.
+SAVEPOINT to mark intermediate points.
+
+CHAPTER 2: SQL QUERIES - SELECT
+
+Basic SELECT:
+SELECT column1, column2 FROM table_name;
+SELECT * FROM table_name; (select all columns, avoid in production code)
+SELECT DISTINCT column FROM table; (unique values only)
+
+Filtering with WHERE:
+SELECT * FROM students WHERE age > 18;
+Comparison: = (equal), != or <> (not equal), < > <= >=
+BETWEEN: WHERE price BETWEEN 100 AND 500 (inclusive)
+IN: WHERE country IN ('India', 'USA', 'UK')
+LIKE: WHERE name LIKE 'A%' (starts with A), '%son' (ends with son), '%art%' (contains art)
+IS NULL: WHERE email IS NULL
+IS NOT NULL: WHERE phone IS NOT NULL
+Logical: AND, OR, NOT. AND has higher precedence than OR. Use parentheses.
+
+Sorting with ORDER BY:
+SELECT * FROM products ORDER BY price ASC; (default is ASC)
+SELECT * FROM products ORDER BY price DESC;
+ORDER BY multiple columns: ORDER BY category ASC, price DESC;
+
+Limiting results:
+SELECT * FROM products ORDER BY price LIMIT 10; (first 10 rows)
+SELECT * FROM products ORDER BY price LIMIT 10 OFFSET 20; (rows 21-30, for pagination)
+
+Aggregate functions:
+COUNT(*): count all rows. COUNT(column): count non-null values.
+SUM(column): sum of values. AVG(column): average.
+MAX(column): maximum value. MIN(column): minimum value.
+
+GROUP BY and HAVING:
+GROUP BY groups rows with same values. Used with aggregate functions.
+SELECT category, COUNT(*), AVG(price) FROM products GROUP BY category;
+HAVING filters groups (like WHERE but for grouped results):
+SELECT category, COUNT(*) AS cnt FROM products GROUP BY category HAVING cnt > 10;
+
+String functions:
+CONCAT(s1, s2): concatenate strings. LENGTH(s): string length.
+UPPER(s), LOWER(s): case conversion. TRIM(s): remove whitespace.
+SUBSTRING(s, start, length): extract part. REPLACE(s, old, new): replace.
+LEFT(s, n), RIGHT(s, n): leftmost or rightmost n chars.
+
+Date and time functions:
+NOW(): current date and time. CURDATE(): current date. CURTIME(): current time.
+DATE_FORMAT(date, format): format date string.
+DATEDIFF(d1, d2): difference in days. DATE_ADD(date, INTERVAL n DAY).
+YEAR(), MONTH(), DAY(), HOUR(), MINUTE(): extract parts.
+
+Conditional expressions:
+CASE WHEN condition THEN result ELSE other END: switch-like expression.
+IFNULL(value, alternative): return alternative if value is null.
+COALESCE(v1, v2, v3): return first non-null value.
+
+CHAPTER 3: JOINS AND SUBQUERIES
+
+INNER JOIN (most common):
+Returns rows that have matches in BOTH tables.
+SELECT s.name, c.title FROM students s INNER JOIN courses c ON s.course_id = c.id;
+
+LEFT JOIN:
+Returns ALL rows from left table, and matching rows from right. Null for no match.
+Use when you want all records from one table regardless of match.
+SELECT s.name, e.grade FROM students s LEFT JOIN enrollments e ON s.id = e.student_id;
+
+RIGHT JOIN:
+Returns ALL rows from right table, matching from left. Less common, prefer LEFT JOIN.
+
+FULL OUTER JOIN:
+Returns all rows from both tables. MySQL does not support directly, simulate with UNION.
+
+CROSS JOIN:
+Returns Cartesian product (every combination). Use with care, O(n*m) rows.
+
+Self JOIN:
+Table joined with itself. Use to find records related to other records in same table.
+SELECT e.name AS employee, m.name AS manager FROM employees e JOIN employees m ON e.manager_id = m.id;
+
+Multiple JOINs:
+SELECT s.name, c.title, g.grade
+FROM students s
+JOIN enrollments e ON s.id = e.student_id
+JOIN courses c ON e.course_id = c.id
+JOIN grades g ON e.id = g.enrollment_id;
+
+Subqueries:
+Query inside another query. Can be in SELECT, FROM, WHERE, HAVING.
+WHERE subquery: SELECT * FROM products WHERE price > (SELECT AVG(price) FROM products);
+FROM subquery (derived table): SELECT * FROM (SELECT ...) AS sub;
+EXISTS: SELECT * FROM customers WHERE EXISTS (SELECT 1 FROM orders WHERE orders.customer_id = customers.id);
+IN with subquery: SELECT * FROM students WHERE id IN (SELECT student_id FROM honors_list);
+
+Common Table Expressions (CTEs):
+WITH cte_name AS (SELECT ...) SELECT * FROM cte_name;
+More readable than nested subqueries. Can be referenced multiple times.
+Recursive CTEs for hierarchical data.
+
+CHAPTER 4: DATABASE NORMALIZATION
+
+Purpose: eliminate data redundancy, ensure data integrity, simplify updates.
+
+First Normal Form (1NF):
+Each column has atomic (indivisible) values.
+No repeating groups or arrays.
+Each row is unique (has primary key).
+
+Second Normal Form (2NF):
+Must be in 1NF.
+No partial dependencies: non-key attributes must depend on the ENTIRE primary key.
+Applies when primary key is composite (multiple columns).
+
+Third Normal Form (3NF):
+Must be in 2NF.
+No transitive dependencies: non-key attributes must depend ONLY on the primary key.
+Example: if zip_code determines city, city should be in separate table.
+
+Boyce-Codd Normal Form (BCNF):
+Stricter version of 3NF. Every determinant must be a candidate key.
+
+Denormalization:
+Intentionally adding redundancy for query performance.
+Pre-compute and store aggregates (total_orders column on customers).
+Reduces JOIN operations. Use in read-heavy analytical systems.
+
+CHAPTER 5: INDEXING AND PERFORMANCE
+
+Why indexes?
+Without index: full table scan O(n) for every query.
+With index: O(log n) lookup using B-tree structure.
+Index stores sorted copy of column data with pointers to rows.
+
+Types of indexes:
+Primary index: automatically created on primary key.
+Unique index: ensures column values are unique.
+Composite index: on multiple columns together. Order matters.
+Covering index: includes all columns a query needs (no table lookup needed).
+Full-text index: for text search with MATCH AGAINST.
+
+Creating indexes:
+CREATE INDEX idx_name ON table(column);
+CREATE UNIQUE INDEX idx_name ON table(column);
+CREATE INDEX idx_name ON table(col1, col2); (composite)
+Indexes created automatically on PRIMARY KEY and UNIQUE constraints.
+
+When to create indexes:
+On columns used in WHERE clauses frequently.
+On columns used in JOIN conditions.
+On columns used in ORDER BY and GROUP BY.
+On foreign key columns.
+
+When NOT to index:
+Small tables (full scan is fast enough).
+Columns with low cardinality (few distinct values like boolean).
+Columns rarely queried. Too many indexes slow down INSERT, UPDATE, DELETE.
+
+Query analysis with EXPLAIN:
+EXPLAIN SELECT ... shows query execution plan.
+type column: const (best), ref, range, index, ALL (full scan, worst).
+key column: shows which index is used.
+rows column: estimated rows examined.
+
+Query optimization tips:
+Avoid SELECT * in production. Select only needed columns.
+Use LIMIT to restrict results.
+Avoid functions on indexed columns in WHERE (prevents index use).
+Use indexes on JOIN columns.
+Avoid OR when possible (use UNION instead).
+Write conditions in WHERE to filter early.
+
+CHAPTER 6: ADVANCED SQL
+
+Window Functions:
+Perform calculation across set of rows related to current row.
+SELECT name, salary, AVG(salary) OVER (PARTITION BY department) AS dept_avg FROM employees;
+ROW_NUMBER(): unique number per row. RANK(): rank with gaps. DENSE_RANK(): rank without gaps.
+LAG(col, n): value from n rows before. LEAD(col, n): value from n rows after.
+SUM OVER (ORDER BY date): running total.
+
+Stored Procedures:
+Precompiled SQL code stored in database. Called by name.
+Accepts parameters. Can use variables, IF, WHILE, loops.
+Reduces network traffic (call once, run many queries server-side).
+CREATE PROCEDURE name (IN param_name type) BEGIN ... END;
+
+Triggers:
+Code executed automatically before or after INSERT, UPDATE, DELETE.
+CREATE TRIGGER trigger_name BEFORE INSERT ON table FOR EACH ROW BEGIN ... END;
+Use for audit logging, enforcing complex constraints, syncing tables.
+
+Views:
+Virtual table based on SELECT query. Simplifies complex queries.
+CREATE VIEW view_name AS SELECT ...;
+Does not store data (except materialized views in PostgreSQL).
+Can be queried like a regular table. Can restrict access to sensitive columns.
+
+Introduction to NoSQL:
+Document databases (MongoDB): schema-flexible JSON documents. Great for content management.
+Key-value stores (Redis): ultra-fast in-memory. Great for caching, sessions.
+Column-family (Cassandra): wide column store. Great for time-series, analytics.
+Graph databases (Neo4j): for highly connected data (social networks, recommendations).
+Choose NoSQL when: schema changes frequently, massive scale, complex nested data.

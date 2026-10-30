@@ -1,0 +1,329 @@
+FULL-STACK WEB DEVELOPMENT - COMPLETE COURSE NOTES
+
+CHAPTER 1: HTML AND THE WEB
+
+HTML HyperText Markup Language is the backbone of every webpage. It provides structure and semantic meaning.
+
+Basic HTML document structure:
+DOCTYPE declaration at top, html element wrapping everything, head section with meta tags and title, body section with visible content.
+
+Meta tags important for SEO and mobile:
+charset=UTF-8 for character encoding.
+viewport with width=device-width initial-scale=1.0 for responsive design.
+description for SEO meta description.
+
+Semantic HTML5 elements:
+header: top section of page or article
+nav: navigation links
+main: primary content of page
+article: self-contained content (blog post, news article)
+section: thematic grouping of content
+aside: complementary content, sidebar
+footer: bottom of page or section
+figure and figcaption: image with caption
+time: date or time
+address: contact information
+
+Forms and inputs:
+form element with action (URL) and method (GET or POST).
+Input types: text, email, password, number, date, checkbox, radio, file, submit.
+label element associates text label with input (using for and id attributes).
+required attribute for validation. pattern for regex validation.
+select and option for dropdowns. textarea for multiline text.
+
+Accessibility basics:
+Use semantic elements instead of generic div and span.
+Add alt text to all images.
+Use aria-label for elements without visible text.
+Ensure keyboard navigation works.
+Maintain color contrast ratio of at least 4.5:1.
+
+CHAPTER 2: CSS
+
+Box Model:
+Every HTML element is a rectangular box.
+Content: actual content inside.
+Padding: space between content and border.
+Border: line around padding.
+Margin: space outside border.
+box-sizing border-box: width and height include padding and border.
+
+CSS Selectors:
+Element selector: p selects all p elements
+Class selector: .card selects all elements with class card
+ID selector: #header selects element with id header
+Attribute selector: input[type=email] selects email inputs
+Pseudo-class: button:hover, input:focus, li:first-child
+Pseudo-element: p::before, p::after
+Combinator: div > p (direct child), div p (descendant), h1 + p (adjacent sibling)
+
+Flexbox for one-dimensional layouts:
+display flex on container. flex-direction row or column.
+justify-content for main axis: flex-start, center, space-between, space-around, space-evenly.
+align-items for cross axis: stretch, center, flex-start, flex-end.
+flex-wrap for wrapping. gap for spacing between items.
+flex: 1 makes item grow to fill available space.
+order property to change visual order.
+
+CSS Grid for two-dimensional layouts:
+display grid on container.
+grid-template-columns: repeat(3, 1fr) creates three equal columns.
+grid-template-rows for row sizes.
+gap for gutters between cells.
+grid-column: span 2 makes item span two columns.
+grid-area for named areas.
+
+Positioning:
+static: default, normal flow
+relative: offset from normal position, doesn't affect other elements
+absolute: removed from flow, positioned relative to nearest positioned ancestor
+fixed: positioned relative to viewport, stays during scroll
+sticky: hybrid of relative and fixed
+
+CSS Variables (Custom Properties):
+Define in :root for global scope.
+Use var(--variable-name) to reference.
+Can be overridden in component scope.
+
+Transitions and Animations:
+transition: property duration timing-function for hover effects.
+animation: keyframe-name duration for complex animations.
+Define keyframes with @keyframes name { from {} to {} } or percentage steps.
+
+Responsive Design with Media Queries:
+@media (max-width: 768px) applies styles on small screens.
+Mobile-first approach: write base styles for mobile, add media queries for larger screens.
+Common breakpoints: 480px mobile, 768px tablet, 1024px desktop, 1440px wide desktop.
+
+CHAPTER 3: JAVASCRIPT
+
+JavaScript is the language of the web. It runs in browsers and on servers via Node.js.
+
+Variables and scoping:
+var: function-scoped, hoisted, avoid in modern JS.
+let: block-scoped, not hoisted (temporal dead zone), reassignable.
+const: block-scoped, not reassignable (but object properties can change).
+
+Data types:
+Primitives: string, number, bigint, boolean, undefined, null, symbol.
+Reference types: objects, arrays, functions.
+typeof operator for checking types.
+
+String methods:
+length, toUpperCase, toLowerCase, trim, split, join, replace, includes, startsWith, endsWith, indexOf, slice, substring.
+Template literals use backtick for string interpolation.
+
+Array methods:
+map: transform each element, returns new array.
+filter: keep elements matching condition, returns new array.
+reduce: accumulate values, returns single value.
+forEach: iterate without return value.
+find: returns first matching element.
+findIndex: returns index of first match.
+some: returns true if any element matches.
+every: returns true if all elements match.
+includes: checks if value exists.
+flat and flatMap for nested arrays.
+sort: sorts in place. slice: returns portion. splice: modifies in place.
+
+Object methods:
+Object.keys, Object.values, Object.entries for iteration.
+Object.assign for shallow merge. Spread operator for copying.
+Destructuring for extracting properties.
+Optional chaining with question mark dot for safe property access.
+Nullish coalescing with double question mark for default values.
+
+DOM Manipulation:
+document.getElementById, querySelector, querySelectorAll for selecting elements.
+element.textContent for text. element.innerHTML for HTML (careful with XSS).
+element.classList.add, remove, toggle, contains for CSS classes.
+element.style.property for inline styles.
+element.setAttribute, getAttribute for attributes.
+element.addEventListener for events. Common events: click, input, submit, keydown, mouseover.
+Creating elements: document.createElement, element.appendChild, element.prepend, element.remove.
+
+Event handling:
+event.preventDefault() stops default browser behavior (form submission, link navigation).
+event.stopPropagation() prevents event bubbling.
+Event delegation: attach listener to parent, check event.target for specific child.
+
+CHAPTER 4: ADVANCED JAVASCRIPT ES6+
+
+Destructuring:
+Array destructuring: const [first, second, ...rest] = array.
+Object destructuring: const { name, age, email: userEmail } = user.
+Default values: const { role = 'student' } = user.
+Nested destructuring: const { address: { city } } = user.
+
+Spread and Rest:
+Spread arrays: [...arr1, ...arr2] combines arrays.
+Spread objects: { ...obj1, ...obj2 } merges objects.
+Rest parameters: function sum(...numbers) collects remaining args.
+
+Promises:
+Promise represents eventual completion or failure of async operation.
+States: pending, fulfilled (resolved), rejected.
+then for success handler, catch for error handler, finally for cleanup.
+Promise.all: waits for all promises, fails if any fail. Returns array of results.
+Promise.allSettled: waits for all, returns results with status regardless of success.
+Promise.race: resolves/rejects with first settled promise.
+Promise.any: resolves with first successful promise.
+
+Async Await:
+Syntactic sugar over Promises. async function returns Promise.
+await pauses execution until Promise resolves. Only inside async function.
+Use try catch finally for error handling.
+Run independent async operations in parallel with Promise.all instead of sequential awaits.
+
+Modules:
+Named exports: export const name and export function foo.
+Default export: export default class or function.
+Named imports: import { name, foo } from './module.js'.
+Default import: import MyClass from './module.js'.
+Re-export: export { name } from './other.js'.
+
+CHAPTER 5: REACT.JS
+
+React is a JavaScript library for building user interfaces from reusable components.
+
+Component basics:
+Function components are preferred over class components.
+JSX is HTML-like syntax that compiles to React.createElement calls.
+Components must return single root element (or Fragment).
+Props are read-only inputs to components. Destructure in parameters.
+Keys are required on list items for reconciliation.
+
+useState hook:
+Declares state variable and setter function.
+State updates trigger re-render.
+Never mutate state directly, always use setter.
+For objects and arrays, pass new reference: setter([...prev, newItem]).
+Multiple useState hooks for multiple pieces of state.
+
+useEffect hook:
+Runs side effects after render.
+Dependency array controls when effect runs.
+Empty array: runs once on mount.
+With dependencies: runs when any dependency changes.
+No array: runs after every render.
+Return cleanup function for subscriptions, timers, event listeners.
+
+useRef hook:
+Persists value across renders without causing re-render.
+Access DOM elements with ref prop.
+Store mutable values that should not trigger re-render.
+
+useMemo and useCallback:
+useMemo: memoize expensive computation. Recomputes only when dependencies change.
+useCallback: memoize function reference. Prevents unnecessary re-renders of child components.
+
+Context API:
+Create context with React.createContext.
+Provide value with Context.Provider wrapping component tree.
+Consume with useContext(MyContext) hook.
+Avoids prop drilling for global state like theme, auth, language.
+
+React Router:
+BrowserRouter wraps entire app.
+Routes contains all Route definitions.
+Route path and element props.
+Link component for navigation (no page reload).
+useNavigate hook for programmatic navigation.
+useParams for URL parameters. useSearchParams for query strings.
+
+CHAPTER 6: NODE.JS AND EXPRESS
+
+Node.js is a JavaScript runtime built on Chrome V8 engine. Non-blocking, event-driven I/O.
+
+Core modules:
+fs: file system operations.
+path: file path utilities.
+http: creating HTTP servers.
+os: operating system info.
+events: EventEmitter for custom events.
+crypto: cryptographic functions.
+
+NPM (Node Package Manager):
+npm init to create package.json.
+npm install package-name to install dependency.
+npm install --save-dev for development dependencies.
+npm run script-name to run scripts.
+package-lock.json locks exact dependency versions.
+node_modules contains installed packages (add to .gitignore).
+
+Express framework:
+app.use(express.json()) for parsing JSON bodies.
+app.use(cors()) for Cross-Origin Resource Sharing.
+app.get, app.post, app.put, app.delete, app.patch for route handlers.
+req.body for request body. req.params for URL parameters. req.query for query strings.
+res.json to send JSON. res.status to set HTTP status code. res.send for text.
+
+Middleware:
+Functions that have access to req, res, next.
+Call next() to pass to next middleware or route handler.
+Order matters: middleware applied in registration order.
+Error middleware: four parameters (err, req, res, next).
+Use for: logging, authentication, input validation, error handling.
+
+REST API design:
+GET /resources: list all resources.
+GET /resources/:id: get specific resource.
+POST /resources: create new resource, return 201.
+PUT /resources/:id: replace entire resource.
+PATCH /resources/:id: partial update.
+DELETE /resources/:id: delete resource, return 204.
+
+JWT Authentication flow:
+User sends email and password to POST /auth/login.
+Server verifies credentials, creates JWT with payload (user id, role, expiry).
+JWT signed with secret key: header.payload.signature in base64.
+Client stores JWT (localStorage or httpOnly cookie).
+Client sends JWT in Authorization: Bearer token header.
+Server verifies JWT signature on protected routes.
+Never store sensitive data in JWT payload (it is only encoded, not encrypted).
+
+Environment variables:
+Use dotenv package. Create .env file with KEY=value.
+Access via process.env.KEY.
+Never commit .env to version control. Add to .gitignore.
+
+CHAPTER 7: DATABASES
+
+SQL databases (relational):
+Structured schema with tables, rows, columns.
+Strong ACID guarantees.
+Powerful JOIN queries.
+Best for: complex relationships, transactions, reporting.
+Examples: MySQL, PostgreSQL, SQLite.
+
+Basic SQL queries:
+SELECT columns FROM table WHERE condition ORDER BY column LIMIT n.
+INSERT INTO table (columns) VALUES (values).
+UPDATE table SET column=value WHERE condition.
+DELETE FROM table WHERE condition.
+JOIN: combine data from multiple tables on matching columns.
+
+MySQL with Node.js:
+Use mysql2 package with promise support.
+Create connection pool for efficiency.
+Use parameterized queries with question marks to prevent SQL injection.
+Never concatenate user input into SQL strings.
+
+MongoDB (NoSQL document database):
+Documents instead of rows. JSON-like BSON format.
+Schema-flexible, each document can have different fields.
+Collections instead of tables.
+find, findOne, insertOne, updateOne, deleteOne methods.
+Mongoose library adds schema validation and models to Node.js.
+
+Database design principles:
+Normalization: eliminate data redundancy. Store each piece of data once.
+Relationships: one-to-one, one-to-many, many-to-many (junction table).
+Indexes: speed up queries on frequently searched columns.
+Foreign keys: maintain referential integrity.
+
+Deployment:
+Use environment variables for database credentials.
+Use connection pooling for performance.
+Enable SSL for database connections in production.
+Regular backups. Monitor query performance.

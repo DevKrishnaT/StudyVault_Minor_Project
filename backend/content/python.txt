@@ -1,0 +1,190 @@
+PYTHON PROGRAMMING - COMPLETE COURSE NOTES
+
+CHAPTER 1: PYTHON BASICS
+
+Python is a high-level, interpreted, dynamically-typed language known for readable syntax and versatility.
+
+Variables and data types:
+name = "Alice" creates a string variable.
+age = 22 creates an integer.
+gpa = 3.85 creates a float.
+is_enrolled = True creates a boolean.
+nothing = None is the null value in Python.
+
+Python is dynamically typed: variable type determined at runtime.
+Type checking: type(variable) returns the type.
+Type conversion: int("42"), float("3.14"), str(100), bool(0) returns False.
+Truthy and falsy: 0, empty string, empty list, None, False are all falsy.
+
+String operations:
+len(s) returns length. s.upper() and s.lower() change case.
+s.strip() removes whitespace. s.split(",") splits into list.
+s.replace("old","new") replaces. s.startswith("x") and s.endswith("x") check.
+s.find("sub") returns index or -1. String slicing: s[start:end:step].
+f-strings for interpolation: use f with curly braces for variables.
+
+Input and output:
+input("prompt") reads user input as string.
+print(value, end="\n", sep=" ") for output.
+Convert input: int(input("Enter number: "))
+
+CHAPTER 2: CONTROL FLOW
+
+Conditionals:
+if condition followed by elif and else blocks.
+Python uses indentation (4 spaces) to define blocks.
+Comparison operators: == != < > <= >=
+Logical: and, or, not. Membership: in, not in. Identity: is, is not.
+Ternary: value = x if condition else y
+
+For loops:
+for i in range(5) iterates 0 to 4.
+for i in range(1, 10, 2) iterates with step.
+for item in list iterates over list.
+for i, item in enumerate(list) gives index and value.
+for key, value in dict.items() iterates dictionary.
+for a, b in zip(list1, list2) iterates two lists together.
+
+While loops:
+while condition continues while True.
+break exits loop. continue skips to next iteration.
+pass is a placeholder that does nothing.
+while True creates infinite loop (need break to exit).
+
+CHAPTER 3: FUNCTIONS
+
+Defining functions:
+def function_name(parameters): followed by indented body.
+return statement returns value. Returns None if no return.
+Multiple return values: return a, b (returned as tuple).
+
+Parameters and arguments:
+Positional: def add(a, b) called as add(1, 2).
+Keyword: add(a=1, b=2). Default: def greet(name, greeting="Hello").
+*args collects extra positional args as tuple.
+**kwargs collects extra keyword args as dict.
+Order: positional, *args, keyword defaults, **kwargs.
+
+Lambda functions:
+Anonymous single-expression functions.
+square = lambda x: x * x
+Used with map, filter, sorted.
+
+Scope (LEGB rule):
+Local: variables inside function.
+Enclosing: variables in outer function (closures).
+Global: variables at module level.
+Built-in: Python built-in names.
+Use global keyword to modify global. Use nonlocal for enclosing scope.
+
+Recursion:
+Function calling itself. Must have base case to stop.
+Python default recursion limit is 1000.
+
+CHAPTER 4: DATA STRUCTURES
+
+Lists (ordered, mutable, allows duplicates):
+append(x) adds to end. insert(i, x) at index. extend(iterable) adds multiple.
+remove(x) removes first. pop() removes last. pop(i) removes at index.
+index(x) finds position. sort() sorts in place. len(list) gets length.
+sorted(list) returns new sorted list. List slicing: list[start:end:step].
+
+Tuples (ordered, immutable):
+Created with parentheses (1, 2, 3).
+Tuple unpacking: a, b, c = (1, 2, 3).
+Faster than lists. Hashable (can be dict key or set member).
+
+Dictionaries (key-value pairs):
+dict.get(key, default) returns default if missing.
+dict.keys(), dict.values(), dict.items() for iteration.
+key in dict checks membership.
+Dictionary comprehension: {k: v for k, v in pairs}
+
+Sets (unordered, unique elements):
+add(x), remove(x), discard(x).
+Union: s1 | s2. Intersection: s1 & s2. Difference: s1 - s2.
+
+List comprehensions:
+[expression for item in iterable if condition]
+squares = [x**2 for x in range(10)]
+evens = [x for x in range(20) if x % 2 == 0]
+
+Generator expressions (lazy evaluation):
+(expression for item in iterable) - memory efficient.
+sum(x**2 for x in range(1000)) more efficient than list.
+
+CHAPTER 5: OBJECT-ORIENTED PROGRAMMING
+
+Classes and objects:
+class defines blueprint. __init__ is constructor.
+self refers to current instance. First parameter of all instance methods.
+
+Inheritance:
+class Dog(Animal) inherits from Animal.
+super().__init__() calls parent constructor.
+Child inherits all parent methods and attributes.
+
+Magic/Dunder methods:
+__str__: string representation for print.
+__len__: len(obj). __add__: obj1 + obj2. __eq__: obj1 == obj2.
+__iter__ and __next__: make object iterable.
+__enter__ and __exit__: context manager with with statement.
+
+Encapsulation:
+Prefix with _ for protected convention.
+Prefix with __ for name-mangled private.
+@property decorator for getter/setter.
+
+CHAPTER 6: FILE HANDLING AND EXCEPTIONS
+
+File operations:
+open(path, mode) opens file. Always use with statement.
+Modes: r (read), w (write), a (append), b (binary).
+read() reads entire file. readline() reads one line. readlines() returns list.
+
+Working with JSON:
+json.dumps(data) converts to JSON string.
+json.loads(string) parses JSON string.
+json.dump(data, file) writes to file. json.load(file) reads from file.
+
+Exception handling:
+try block contains code that might raise exception.
+except ExceptionType as e catches specific exception.
+else block runs if no exception. finally always runs.
+raise ExceptionType("message") to raise exception.
+
+Custom exceptions:
+class MyError(Exception): inherits from Exception.
+
+Common built-in exceptions:
+ValueError, TypeError, KeyError, IndexError, FileNotFoundError, AttributeError.
+
+CHAPTER 7: PYTHON LIBRARIES
+
+Virtual environments:
+python -m venv venv creates environment.
+pip install package installs packages.
+pip freeze > requirements.txt saves dependencies.
+
+Requests library for HTTP:
+response = requests.get(url, params=dict, headers=dict)
+response.status_code, response.json(), response.text.
+requests.post(url, json=data) for POST requests.
+
+Pandas for data analysis:
+pd.read_csv(file) reads CSV. df.head(n) shows first n rows.
+df['column'] selects column. df[df['age'] > 18] filters rows.
+df.groupby('cat')['sales'].sum() groups and aggregates.
+df.sort_values('col') sorts. df.merge(other, on='key') joins.
+
+Matplotlib for plotting:
+plt.plot(x, y) line plot. plt.scatter(x, y) scatter.
+plt.bar(x, y) bar chart. plt.hist(data, bins=10) histogram.
+plt.title(), plt.xlabel(), plt.ylabel() for labels.
+plt.savefig(filename) saves. plt.show() displays.
+
+NumPy for numerical computing:
+np.array([1,2,3]) creates array. np.zeros((m,n)) zero matrix.
+Array operations are element-wise: arr1 + arr2, arr * 2.
+np.mean, np.sum, np.min, np.max for statistics.
+np.dot for matrix multiplication. np.reshape to change shape.

@@ -1,0 +1,265 @@
+DATA STRUCTURES AND ALGORITHMS - COMPLETE COURSE NOTES
+
+CHAPTER 1: ARRAYS AND STRINGS
+
+Arrays are contiguous blocks of memory that store elements of the same type. They provide O(1) random access by index.
+
+Common array operations:
+- Access: O(1) by index
+- Search: O(n) linear, O(log n) binary search on sorted arrays
+- Insert at end: O(1) amortized for dynamic arrays
+- Insert/Delete at middle: O(n) due to shifting
+
+Two-Pointer Technique:
+Used to solve problems with pairs in a sorted array. One pointer at start, one at end.
+Example finding two numbers that sum to target: if sum < target move left right, if sum > target move right left.
+Time: O(n), Space: O(1)
+
+Sliding Window:
+Used for contiguous subarray problems. Expand window by moving right pointer, shrink by moving left pointer.
+Fixed window: maintain a window of size k moving across array.
+Variable window: expand until condition violated, then shrink.
+Maximum sum subarray of size k: add entering element, subtract leaving element. Time O(n).
+
+String Problems:
+Reverse a string: swap characters from both ends using two pointers.
+Palindrome check: compare string with its reverse, or use two pointers from ends.
+Anagram check: sort both strings and compare, or use frequency count map.
+Substring search: sliding window, KMP algorithm for pattern matching.
+
+CHAPTER 2: LINKED LISTS
+
+A linked list is a linear data structure where each node contains data and a pointer to the next node.
+
+Types:
+Singly Linked List: each node points to next only
+Doubly Linked List: each node points to next and previous
+Circular Linked List: last node points back to first
+
+Operations time complexity:
+Insert at head: O(1)
+Insert at tail: O(n) singly, O(1) doubly with tail pointer
+Delete node: O(n) to find, O(1) to delete
+Search: O(n)
+
+Floyd Cycle Detection (Fast and Slow Pointers):
+Use two pointers. Slow moves one step, fast moves two steps.
+If cycle exists, fast and slow will meet inside cycle.
+To find cycle start: reset slow to head, both move one step until they meet again at cycle entry.
+
+Reversing a Linked List iteratively:
+Initialize prev as null, curr as head.
+While curr is not null: save next = curr.next, set curr.next = prev, set prev = curr, set curr = next.
+Return prev as new head. Time O(n), Space O(1).
+
+Merge two sorted linked lists:
+Compare heads of both lists, take smaller one as next node.
+Recursively merge remaining. Time O(n+m).
+
+Find middle of linked list:
+Use slow and fast pointers. When fast reaches end, slow is at middle.
+
+CHAPTER 3: STACKS AND QUEUES
+
+Stack (Last In First Out LIFO):
+push: add to top
+pop: remove from top
+peek or top: view top without removing
+isEmpty: check if empty
+Applications: function call stack, undo/redo operations, expression evaluation, DFS traversal, balanced parentheses.
+
+Queue (First In First Out FIFO):
+enqueue: add to back
+dequeue: remove from front
+peek: view front without removing
+Applications: BFS traversal, task scheduling, print queue, sliding window problems.
+
+Monotonic Stack:
+Stack maintaining elements in sorted order (increasing or decreasing).
+Used for Next Greater Element: process array left to right.
+Pop elements smaller than current (for next greater), push current.
+Result for each popped element is current element.
+Time O(n) for entire array. Applications: Daily Temperatures, Largest Rectangle in Histogram.
+
+Priority Queue (Heap):
+Min-Heap: parent is always smaller than children, root is minimum element.
+Max-Heap: parent is always larger than children, root is maximum element.
+Insert: O(log n) bubble up
+Extract min/max: O(log n) bubble down after replacing root with last element
+Peek min/max: O(1)
+Build heap from array: O(n) using heapify
+Applications: Dijkstra algorithm, Prim MST, kth largest element, merge k sorted lists.
+
+CHAPTER 4: TREES AND BINARY SEARCH TREES
+
+Binary Tree: each node has at most two children (left and right).
+
+Tree Traversals:
+Inorder Left Root Right: gives sorted order for BST. Used to validate BST.
+Preorder Root Left Right: useful for copying tree or serialization. Root processed before subtrees.
+Postorder Left Right Root: useful for deleting tree. Root processed after subtrees.
+Level Order BFS: visit nodes level by level using a queue. Useful for level-based problems.
+
+Binary Search Tree (BST) properties:
+All nodes in left subtree have keys less than root.
+All nodes in right subtree have keys greater than root.
+Both left and right subtrees are also BSTs.
+
+BST operations:
+Search: O(h) where h is height. Compare with root, go left if smaller, right if larger.
+Insert: O(h). Find correct position using search, insert new node.
+Delete: O(h). Three cases: leaf node (just remove), one child (replace with child), two children (replace with inorder successor).
+
+Balanced vs Unbalanced BST:
+Balanced BST (AVL, Red-Black): height O(log n), all operations O(log n).
+Unbalanced: height O(n) in worst case (sorted insertion), operations O(n).
+
+Height of Binary Tree:
+height(null) = 0
+height(node) = 1 + max(height(left), height(right))
+
+Diameter of Binary Tree:
+For each node, diameter through it = left_height + right_height.
+Diameter = maximum of this value across all nodes.
+
+Lowest Common Ancestor (LCA):
+If both nodes are in left subtree, LCA is in left subtree.
+If both in right, LCA is in right subtree.
+Otherwise, current node is LCA.
+
+CHAPTER 5: GRAPHS
+
+Graph G = (V, E) where V is set of vertices and E is set of edges.
+
+Graph types:
+Directed vs Undirected: directed edges have direction, undirected do not.
+Weighted vs Unweighted: edges may have weights/costs.
+Cyclic vs Acyclic: may or may not contain cycles.
+Connected vs Disconnected: every vertex reachable from every other vs not.
+
+Representation:
+Adjacency Matrix: V x V matrix. Edge(i,j) = 1 if edge exists. Space O(V^2), lookup O(1).
+Adjacency List: array of lists. Space O(V+E), lookup O(degree).
+Edge List: list of all edges. Space O(E).
+
+BFS (Breadth First Search):
+Use queue. Start from source, mark visited.
+Dequeue node, enqueue all unvisited neighbors.
+Finds shortest path in unweighted graph (minimum hops).
+Time O(V+E), Space O(V).
+
+DFS (Depth First Search):
+Use stack or recursion. Start from source, mark visited.
+Explore as deep as possible before backtracking.
+Used for: cycle detection, connected components, topological sort, flood fill.
+Time O(V+E), Space O(V).
+
+Topological Sort (for DAG only):
+Linear ordering where for each directed edge u to v, u comes before v in ordering.
+DFS approach: after fully exploring a node, add to front of result list.
+Kahn algorithm: use in-degree count. Start with nodes of in-degree 0 in queue. Process and reduce neighbors in-degree.
+
+Dijkstra Shortest Path:
+For graphs with non-negative edge weights.
+Use min priority queue. Initialize dist[source]=0, all others infinity.
+Always process vertex with minimum current distance.
+Update neighbors if shorter path found through current vertex.
+Time O((V+E) log V) with binary heap.
+
+Bellman-Ford Algorithm:
+Handles negative edge weights. Detects negative cycles.
+Relax all edges V-1 times. If relaxation possible in Vth iteration, negative cycle exists.
+Time O(V*E).
+
+Union-Find (Disjoint Set Union DSU):
+Track connected components efficiently.
+find(x): returns representative/root of x component. Use path compression.
+union(x,y): merges components. Use union by rank.
+With both optimizations: nearly O(1) per operation amortized.
+Used in: Kruskal MST, detecting cycles, connected components.
+
+CHAPTER 6: DYNAMIC PROGRAMMING
+
+DP solves optimization problems by breaking into overlapping subproblems. Store results to avoid recomputation.
+
+Approaches:
+Top-Down Memoization: recursive solution + cache (usually dictionary or array).
+Bottom-Up Tabulation: iterative, fill table starting from base cases.
+
+Steps to solve DP:
+1. Identify subproblem structure
+2. Define state clearly
+3. Write recurrence relation
+4. Identify base cases
+5. Implement with memoization or tabulation
+
+Classic DP Problems:
+
+Fibonacci:
+Naive recursive: O(2^n)
+Memoized: O(n) time, O(n) space
+Tabulation: O(n) time, O(1) space (only need previous two values)
+
+Coin Change (minimum coins):
+dp[0] = 0. For each amount i from 1 to target:
+dp[i] = min(dp[i - coin] + 1) for each coin that fits.
+Time O(amount * coins), Space O(amount).
+
+0/1 Knapsack:
+dp[i][w] = max value using first i items with weight capacity w.
+dp[i][w] = dp[i-1][w] if item weight > w (cannot include)
+dp[i][w] = max(dp[i-1][w], dp[i-1][w-weight[i]] + value[i]) if can include.
+Time O(n*W), Space O(n*W) or O(W) with 1D optimization.
+
+Longest Common Subsequence (LCS):
+dp[i][j] = LCS length of first i chars of s1 and j chars of s2.
+If s1[i]==s2[j]: dp[i][j] = 1 + dp[i-1][j-1]
+Else: dp[i][j] = max(dp[i-1][j], dp[i][j-1])
+Time O(m*n), Space O(m*n).
+
+Longest Increasing Subsequence (LIS):
+dp[i] = length of LIS ending at index i.
+dp[i] = max(dp[j]+1) for all j < i where arr[j] < arr[i].
+Time O(n^2). Can be optimized to O(n log n) with patience sorting.
+
+Edit Distance (Levenshtein):
+dp[i][j] = min operations to convert first i chars of s1 to first j chars of s2.
+If s1[i]==s2[j]: dp[i][j] = dp[i-1][j-1]
+Else: dp[i][j] = 1 + min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]) for delete, insert, replace.
+
+CHAPTER 7: SORTING AND SEARCHING
+
+Comparison-based sorting lower bound: O(n log n).
+
+Simple sorts O(n^2):
+Bubble Sort: repeatedly swap adjacent out-of-order elements. Stable.
+Selection Sort: find minimum, place at front. Not stable.
+Insertion Sort: insert each element into correct position. Stable. Good for nearly sorted data.
+
+Efficient sorts O(n log n):
+Merge Sort: divide in half, sort each half, merge. Stable. Extra O(n) space.
+Quick Sort: pick pivot, partition so left < pivot < right, recurse. Average O(n log n), worst O(n^2). In-place.
+Heap Sort: build max-heap, repeatedly extract max. Not stable. In-place O(1) extra space.
+
+Non-comparison sorts:
+Counting Sort: O(n+k) for integers in range k. Stable.
+Radix Sort: sort by each digit. O(d*(n+k)) where d is digits.
+Bucket Sort: distribute into buckets, sort each. O(n) average.
+
+Binary Search:
+Works on sorted arrays. O(log n).
+Compare target with middle. If equal found. If less, search left half. If greater, search right half.
+Template: left=0, right=len-1. While left<=right: mid=(left+right)/2. Compare and update.
+
+Binary Search on answer:
+Use when answer lies in a range and you can check feasibility.
+Find minimum value x such that check(x) is True.
+Binary search on the answer space instead of array.
+
+Important Interview Tips:
+1. Clarify problem constraints and edge cases before coding.
+2. Think about time and space complexity.
+3. Common complexities: O(1) O(log n) O(n) O(n log n) O(n^2) O(2^n) O(n!).
+4. Start with brute force, then optimize.
+5. Edge cases: empty input, single element, duplicates, negative numbers, overflow.
+6. Consider: sorted vs unsorted, distinct vs duplicate values, positive vs negative integers.

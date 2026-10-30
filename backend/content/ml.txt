@@ -1,0 +1,247 @@
+MACHINE LEARNING AND AI FUNDAMENTALS - COMPLETE COURSE NOTES
+
+CHAPTER 1: WHAT IS MACHINE LEARNING
+
+Machine Learning is a field of AI where systems learn patterns from data rather than being explicitly programmed. Instead of writing rules, you provide examples and the algorithm learns the rules.
+
+Types of Machine Learning:
+
+Supervised Learning: Training data has labeled examples (input-output pairs). Algorithm learns mapping from input to output. Used for classification and regression.
+Examples: spam detection, house price prediction, image classification.
+
+Unsupervised Learning: Training data has no labels. Algorithm finds patterns and structure in data.
+Examples: customer segmentation, anomaly detection, dimensionality reduction.
+
+Reinforcement Learning: Agent learns by interacting with environment. Receives rewards for good actions, penalties for bad. Learns policy to maximize cumulative reward.
+Examples: game playing (AlphaGo), robotics, recommendation systems.
+
+Semi-supervised Learning: Mix of labeled and unlabeled data. Common when labeling is expensive.
+
+Self-supervised Learning: Creates labels from unlabeled data automatically. Used in large language models and GPT.
+
+Key Terminology:
+Features (X): input variables, attributes used for prediction.
+Label or Target (y): output variable to predict.
+Training set: data used to train the model.
+Validation set: data for tuning hyperparameters.
+Test set: held-out data for final evaluation.
+Model: mathematical function mapping inputs to outputs.
+Parameters: values the model learns from data.
+Hyperparameters: settings chosen before training (learning rate, epochs, layers).
+
+Bias-Variance Tradeoff:
+Bias: error from wrong assumptions. High bias means underfitting (model too simple).
+Variance: error from sensitivity to training data fluctuations. High variance means overfitting (model memorizes training data).
+Goal: find right balance. More complex models have lower bias but higher variance.
+
+Overfitting vs Underfitting:
+Overfitting: model performs well on training data but poorly on new data. Learns noise.
+Solutions: more training data, regularization, simpler model, dropout, early stopping.
+Underfitting: model performs poorly on training data. Too simple to learn patterns.
+Solutions: more features, more complex model, longer training.
+
+CHAPTER 2: LINEAR AND LOGISTIC REGRESSION
+
+Linear Regression:
+Models relationship between continuous output and one or more inputs.
+Equation: y = w0 + w1*x1 + w2*x2 + ... (where w are weights/parameters).
+Simple linear regression: one input feature. Multiple linear regression: many features.
+Assumptions: linearity, independence, homoscedasticity, normality of residuals.
+
+Cost Function (MSE - Mean Squared Error):
+Average of squared differences between predictions and actual values.
+MSE = (1/n) * sum((y_pred - y_actual)^2)
+Squaring penalizes large errors more and ensures positive values.
+
+Gradient Descent Optimization:
+Algorithm to minimize cost function by iteratively updating parameters.
+Compute gradient (derivative) of cost with respect to each parameter.
+Update: w = w - learning_rate * gradient
+learning_rate (alpha) controls step size. Too large: overshooting. Too small: slow convergence.
+Batch gradient descent: use all training data per step. Slow but accurate.
+Stochastic gradient descent (SGD): one sample per step. Fast but noisy.
+Mini-batch gradient descent: small batches (32, 64, 128). Best of both.
+
+Logistic Regression (for classification):
+Predicts probability of class membership (not a regression despite the name).
+Applies sigmoid function to linear combination: sigmoid(z) = 1 / (1 + e^(-z)).
+Sigmoid maps any value to range (0, 1).
+Threshold at 0.5: above is class 1, below is class 0.
+Binary cross-entropy loss function (log loss).
+Multiclass with softmax function and categorical cross-entropy.
+
+Regularization:
+L1 (Lasso): adds absolute value of weights to loss. Encourages sparsity (some weights become 0).
+L2 (Ridge): adds squared weights to loss. Prevents any weight from being too large.
+L1+L2 (Elastic Net): combination of both.
+Lambda hyperparameter controls regularization strength.
+
+CHAPTER 3: DECISION TREES AND ENSEMBLE METHODS
+
+Decision Trees:
+Tree structure where each internal node tests a feature, each branch represents outcome, each leaf represents prediction.
+Split criterion for classification: Gini impurity or Information Gain (entropy).
+Split criterion for regression: Mean Squared Error reduction.
+Grows until leaves are pure or max depth reached.
+Pros: interpretable, handles mixed features, no normalization needed.
+Cons: overfits easily, sensitive to small data changes.
+
+Gini Impurity: probability that random sample would be incorrectly classified.
+Gini = 1 - sum(p_i^2) for each class probability p_i.
+Lower is purer. 0 = perfectly pure node.
+
+Information Gain: reduction in entropy (disorder) after split.
+Entropy H = -sum(p_i * log2(p_i)).
+Info Gain = Entropy(parent) - weighted average Entropy(children).
+
+Hyperparameters: max_depth, min_samples_split, min_samples_leaf, max_features.
+
+Random Forest:
+Ensemble of many decision trees (bagging method).
+Each tree trained on random subset of training data (bootstrapping).
+Each split considers random subset of features.
+Prediction: majority vote for classification, mean for regression.
+Reduces variance dramatically compared to single decision tree.
+Feature importance: average reduction in impurity across all trees.
+
+Boosting:
+Builds trees sequentially. Each tree corrects errors of previous.
+AdaBoost: increases weight of misclassified samples.
+Gradient Boosting: fits each tree to residual errors of previous.
+XGBoost: optimized gradient boosting. Handles missing values, built-in regularization, very fast.
+LightGBM: even faster variant for large datasets.
+
+Bagging vs Boosting:
+Bagging: parallel training, reduces variance, good for high-variance models.
+Boosting: sequential training, reduces bias, can overfit if not careful.
+
+CHAPTER 4: NEURAL NETWORKS AND DEEP LEARNING
+
+Biological Inspiration:
+Neural network inspired by human brain's neurons and synapses.
+Each artificial neuron: receives inputs, applies weights, adds bias, passes through activation function.
+
+Perceptron (single neuron):
+output = activation(sum(weight_i * input_i) + bias)
+Binary classification with step function. XOR problem showed single perceptron limitations.
+
+Multi-Layer Perceptron (MLP):
+Input layer, one or more hidden layers, output layer.
+Hidden layers learn intermediate representations.
+More layers = can learn more complex patterns.
+
+Activation Functions:
+ReLU (Rectified Linear Unit): max(0, x). Most common for hidden layers.
+Fast computation, avoids vanishing gradient. Dying ReLU problem for negative inputs.
+Sigmoid: 1/(1+e^-x). Range 0 to 1. Used for binary output. Vanishing gradient.
+Tanh: (e^x - e^-x)/(e^x + e^-x). Range -1 to 1. Zero-centered, better than sigmoid.
+Softmax: for multi-class output. Converts logits to probabilities summing to 1.
+Leaky ReLU: allows small gradient for negative values. Solves dying ReLU.
+
+Backpropagation:
+Algorithm to compute gradients and train neural networks.
+Forward pass: compute predictions layer by layer.
+Compute loss comparing predictions to labels.
+Backward pass: compute gradients of loss w.r.t. each parameter using chain rule.
+Update parameters with gradient descent.
+
+Loss Functions:
+Binary cross-entropy: for binary classification.
+Categorical cross-entropy: for multi-class classification.
+Mean Squared Error: for regression.
+Mean Absolute Error: for regression, less sensitive to outliers.
+
+Convolutional Neural Networks (CNNs):
+Specialized for grid-like data (images). Local connectivity and weight sharing.
+Convolutional layer: applies learned filters to detect features (edges, textures).
+Pooling layer: reduces spatial dimensions. Max pooling takes maximum in region.
+Fully connected layer at end for classification.
+Famous architectures: AlexNet, VGG, ResNet, EfficientNet.
+
+Transfer Learning:
+Use pretrained model (trained on large dataset) as starting point.
+Fine-tune for your specific task with smaller dataset.
+Much faster and better than training from scratch.
+Feature extraction: freeze pretrained layers, only train final layers.
+
+CHAPTER 5: MODEL EVALUATION AND TUNING
+
+Confusion Matrix (for classification):
+True Positive (TP): correctly predicted positive.
+True Negative (TN): correctly predicted negative.
+False Positive (FP): predicted positive but actually negative (Type I error).
+False Negative (FN): predicted negative but actually positive (Type II error).
+
+Metrics:
+Accuracy = (TP + TN) / total. Misleading for imbalanced classes.
+Precision = TP / (TP + FP). Of all predicted positive, how many are truly positive.
+Recall (Sensitivity) = TP / (TP + FN). Of all actual positive, how many did we find.
+F1 Score = 2 * (Precision * Recall) / (Precision + Recall). Harmonic mean.
+AUC-ROC: area under ROC curve. Model's ability to distinguish classes.
+
+When to use which metric:
+Spam detection: high precision (don't want false alarms in inbox).
+Cancer detection: high recall (don't want to miss actual cancer cases).
+Balanced classes: accuracy is fine.
+Imbalanced classes: use F1, precision, recall, or AUC-ROC.
+
+Cross-Validation:
+k-Fold CV: split data into k folds. Train on k-1 folds, test on remaining. Repeat k times.
+Each sample used exactly once for testing. Average results across folds.
+More reliable estimate of model performance than single train-test split.
+Stratified k-Fold: maintains class proportions in each fold.
+
+Hyperparameter Tuning:
+Grid Search: try all combinations. Exhaustive but expensive.
+Random Search: sample random combinations. More efficient than grid search.
+Bayesian Optimization: uses previous results to guide next search. Most efficient.
+Tools: scikit-learn GridSearchCV, RandomizedSearchCV, Optuna.
+
+Feature Engineering:
+Normalization: scale features to [0,1]. MinMaxScaler.
+Standardization: zero mean, unit variance. StandardScaler. Better for algorithms assuming normal distribution.
+One-hot encoding: convert categorical to binary columns.
+Feature selection: remove irrelevant features. Correlation analysis, feature importance.
+Feature creation: create new features from existing ones.
+
+Handling Imbalanced Data:
+Oversample minority class (SMOTE generates synthetic samples).
+Undersample majority class (randomly remove samples).
+Class weights in loss function.
+Collect more data for minority class.
+
+CHAPTER 6: REAL MACHINE LEARNING PROJECTS
+
+Project workflow:
+1. Define problem and success metric.
+2. Collect and understand data (EDA - Exploratory Data Analysis).
+3. Prepare and clean data (handle missing values, outliers, encoding).
+4. Feature engineering.
+5. Split into train, validation, test sets.
+6. Choose and train model.
+7. Evaluate and tune hyperparameters.
+8. Final evaluation on test set.
+9. Deploy model.
+
+Scikit-learn workflow:
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report
+Split data, fit scaler on train (transform train and test), fit model on train, predict on test.
+
+Common algorithms summary:
+Linear/Logistic Regression: fast, interpretable, works well when relationship is linear.
+Decision Tree: interpretable, no preprocessing, prone to overfitting.
+Random Forest: robust, feature importance, good default choice.
+XGBoost: often best for tabular data competitions.
+SVM: good for high-dimensional data, small datasets.
+KNN: simple, no training, slow prediction for large datasets.
+Neural Networks: best for images, text, audio. Needs lots of data.
+
+Model deployment:
+Save model with joblib or pickle.
+Create REST API with Flask or FastAPI.
+Container with Docker.
+Cloud deployment: AWS SageMaker, Google Vertex AI, Azure ML.
+Monitor for data drift and model degradation.

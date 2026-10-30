@@ -1,0 +1,242 @@
+OPERATING SYSTEMS CONCEPTS - COMPLETE COURSE NOTES
+
+CHAPTER 1: PROCESSES AND THREADS
+
+Operating System (OS):
+Software that manages hardware resources and provides services to applications.
+Kernel: core of OS running in privileged mode with full hardware access.
+User space: where applications run. Cannot directly access hardware.
+System calls: interface for user programs to request kernel services.
+
+Process:
+Program in execution. Active entity with resources allocated to it.
+Process state: New, Ready, Running, Waiting or Blocked, Terminated.
+PCB (Process Control Block): data structure storing all information about a process.
+PCB contains: process ID (PID), state, program counter, CPU registers, memory info, open files, scheduling info.
+
+Process lifecycle:
+fork(): create child process. Child is copy of parent.
+exec(): replace current process image with new program.
+wait(): parent waits for child to terminate.
+exit(): process terminates, releases resources.
+Zombie process: child has terminated but parent has not called wait() yet.
+Orphan process: parent terminated before child. Adopted by init (PID 1).
+
+Context Switching:
+Saving state of current process and loading state of next process.
+CPU switches from one process to another.
+Overhead: takes time, no useful work done during switch.
+Stored in PCB: program counter, registers, memory mappings.
+
+Threads:
+Lightweight process. Shares address space with other threads in same process.
+Owns: thread ID, program counter, registers, stack.
+Shares: code segment, data segment, heap, open files, signals.
+Much cheaper to create and switch than processes.
+
+Benefits of threads:
+Responsiveness: one thread handles UI while others do background work.
+Resource sharing: threads naturally share memory (easier than inter-process communication).
+Efficiency: thread creation faster than process creation.
+Scalability: can utilize multiple CPU cores.
+
+User-level threads vs Kernel-level threads:
+User threads: managed by user-space library. OS sees only one thread per process.
+Fast creation and switching. If one thread blocks, all block (1:1 kernel thread mapping needed).
+Kernel threads: managed by OS. True parallelism on multicore. Context switch overhead.
+Modern approach: 1:1 mapping (one user thread = one kernel thread).
+
+CHAPTER 2: CPU SCHEDULING
+
+Scheduling goals depend on system type:
+Batch systems: maximize throughput, CPU utilization.
+Interactive systems: minimize response time.
+Real-time systems: meet deadlines.
+
+Scheduling metrics:
+CPU utilization: percentage of time CPU is busy.
+Throughput: processes completed per unit time.
+Turnaround time: time from submission to completion.
+Waiting time: time spent in ready queue.
+Response time: time from request to first response.
+
+FCFS (First Come First Served):
+Simple. Schedule in order of arrival.
+Non-preemptive: process runs until completion or I/O.
+Convoy effect: short processes wait behind long process.
+Poor average waiting time.
+
+SJF (Shortest Job First):
+Schedule process with shortest burst time next.
+Optimal average waiting time for non-preemptive version.
+Preemptive SJF = SRTF (Shortest Remaining Time First).
+Problem: cannot know burst time in advance. Use exponential averaging to predict.
+
+Round Robin:
+Each process gets fixed time quantum (typically 10-100ms).
+After quantum expires, preempt and go to next process.
+Fair and good for interactive systems.
+Performance depends heavily on quantum size.
+Large quantum: approaches FCFS. Small quantum: context switch overhead dominates.
+
+Priority Scheduling:
+Each process has priority number. Higher priority runs first.
+Starvation: low priority processes may never run.
+Aging: gradually increase priority of waiting processes.
+Preemptive or non-preemptive.
+
+Multilevel Queue Scheduling:
+Multiple queues, each with own scheduling algorithm.
+Foreground (interactive) and background (batch) queues.
+Fixed priority among queues.
+
+Multilevel Feedback Queue (MLFQ):
+Processes can move between queues based on behavior.
+New process enters high priority queue. If uses full quantum, move to lower priority.
+I/O-bound processes stay in high priority. CPU-bound drop to lower priority.
+Simulates SJF without knowing burst times in advance.
+Used in modern operating systems.
+
+CHAPTER 3: MEMORY MANAGEMENT
+
+Physical vs Virtual Memory:
+Physical memory: actual RAM chips. Limited size.
+Virtual memory: each process has own address space. Much larger than physical.
+OS maps virtual addresses to physical addresses using page table.
+Allows more processes than physical RAM can hold.
+Programs see contiguous address space regardless of actual physical layout.
+
+Paging:
+Divide physical memory into fixed-size frames.
+Divide virtual memory into pages of same size.
+Page table maps page number to frame number.
+Page size typically 4KB.
+Internal fragmentation: waste within a page. No external fragmentation.
+
+Page Table Entry:
+Valid bit: page is in memory or not.
+Modified (dirty) bit: page has been written to.
+Reference bit: page was recently accessed.
+Protection bits: read, write, execute permissions.
+Frame number: physical frame location.
+
+TLB (Translation Lookaside Buffer):
+Cache for page table entries. Very fast lookup (1-2 CPU cycles).
+TLB hit: translate in 1 cycle. TLB miss: access page table (100+ cycles).
+TLB hit rate typically 99%+ for well-behaved programs.
+Flushed on context switch (or use ASIDs to avoid flushing).
+
+Segmentation:
+Divide memory into variable-size segments (code, data, stack, heap).
+Each segment has base address and limit.
+External fragmentation: gaps between segments.
+Modern systems often combine paging and segmentation.
+
+Virtual Memory and Demand Paging:
+Not all pages of process need to be in memory.
+Load page into memory only when accessed (demand paging).
+Page fault: process accesses page not in memory. OS loads page from disk.
+Allows running programs larger than physical memory.
+
+Page Replacement Algorithms:
+When memory is full and page fault occurs, must evict a page.
+FIFO: evict oldest page. Simple but Belady anomaly (more frames can cause more faults).
+Optimal (OPT): evict page not used for longest future time. Best performance but impossible to implement (need future knowledge).
+LRU (Least Recently Used): evict page not used for longest past time. Good approximation of optimal.
+Clock Algorithm: approximation of LRU using reference bits. Practical and common.
+
+Thrashing:
+Process spends more time paging than executing. CPU utilization drops.
+Cause: too many processes competing for too little memory.
+Fix: reduce degree of multiprogramming. Add more RAM.
+Working Set Model: keep all pages in current working set in memory.
+
+CHAPTER 4: SYNCHRONIZATION AND DEADLOCKS
+
+Race Condition:
+Multiple processes access shared data concurrently. Final result depends on execution order.
+Must be avoided to ensure data consistency.
+
+Critical Section:
+Code that accesses shared resources. Must not be executed concurrently.
+Requirements for critical section solution:
+Mutual Exclusion: only one process in critical section at a time.
+Progress: if no one is in critical section, processes that want to enter must be able to.
+Bounded Waiting: process must eventually get to enter (no starvation).
+
+Mutex (Mutual Exclusion lock):
+Binary semaphore. Only one thread can hold it at a time.
+lock() or acquire(): take mutex (blocks if held). unlock() or release(): release mutex.
+Used to protect critical sections.
+
+Semaphores:
+Integer variable with atomic wait and signal operations.
+wait(S): decrement S. If S < 0, block.
+signal(S): increment S. If processes waiting, wake one.
+Counting semaphore: controls access to resource with n instances.
+Binary semaphore (mutex): value 0 or 1.
+
+Monitors:
+Higher-level synchronization construct. Built into some languages.
+Only one thread active inside monitor at a time.
+Condition variables: wait() and signal() for thread coordination.
+Java synchronized keyword and C++ std::mutex.
+
+Classic Synchronization Problems:
+Producer-Consumer: producer adds to buffer, consumer removes. Buffer has limited size.
+Use semaphores: full (count of items), empty (count of spaces), mutex (protect buffer).
+Readers-Writers: multiple readers allowed simultaneously. Writers need exclusive access.
+Dining Philosophers: 5 philosophers, 5 forks. Each needs 2 forks. Deadlock-prone.
+
+Deadlock:
+Set of processes where each is waiting for resource held by another. Circular waiting.
+
+Four conditions (all must hold for deadlock):
+Mutual Exclusion: resource can be held by only one process.
+Hold and Wait: process holds resources while waiting for more.
+No Preemption: resources cannot be forcibly taken.
+Circular Wait: circular chain of processes each waiting for next.
+
+Deadlock handling:
+Prevention: eliminate one of four conditions.
+Avoidance: refuse resource if it could lead to deadlock. Banker Algorithm.
+Detection and Recovery: allow deadlock, detect it, recover by killing processes or preempting resources.
+Ignore: hope it does not happen. (Ostrich Algorithm - used in some systems)
+
+Banker Algorithm:
+OS checks if granting resource request leads to safe state.
+Safe state: there exists sequence where all processes can complete.
+If request leads to unsafe state, deny it.
+
+CHAPTER 5: FILE SYSTEMS AND I/O
+
+File System:
+Organizes and stores files on storage devices.
+Provides abstraction: names instead of disk addresses.
+File: named collection of data. Directory: container for files and subdirectories.
+
+File metadata (stored in inode on Unix):
+Size, owner, permissions, timestamps (created, modified, accessed).
+Location of data blocks on disk. Number of hard links.
+
+Inode:
+Data structure storing file metadata (not filename).
+Filename to inode number mapping stored in directory.
+Direct blocks, indirect blocks, double indirect, triple indirect for locating data.
+
+File System Types:
+FAT32 (File Allocation Table): simple, compatible, no journaling. Max file 4GB.
+NTFS (Windows): journaling, permissions, compression, encryption, large files.
+ext4 (Linux): journaling, extents, huge files, fast recovery.
+APFS (Apple): copy-on-write, snapshots, encryption, SSD-optimized.
+
+Journaling:
+Log changes before committing to disk. Allows recovery after crash.
+Write-ahead logging: write journal entry first, then make change.
+On crash recovery: replay journal to reach consistent state.
+
+Disk Scheduling Algorithms:
+FCFS: service requests in order received. May cause long seek times.
+SSTF (Shortest Seek Time First): service closest request. Starvation of far requests.
+SCAN (Elevator): move in one direction servicing requests, reverse at end. Like elevator.
+C-SCAN: only service requests in one direction, jump to beginning. More uniform wait times.

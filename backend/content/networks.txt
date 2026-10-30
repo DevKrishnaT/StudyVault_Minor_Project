@@ -1,0 +1,259 @@
+COMPUTER NETWORKS AND SECURITY - COMPLETE COURSE NOTES
+
+CHAPTER 1: NETWORK MODELS AND PROTOCOLS
+
+Computer network: collection of devices connected to share resources and communicate.
+Protocol: set of rules governing communication format, timing, sequencing, error control.
+
+OSI Model (7 Layers - conceptual framework):
+Layer 7 Application: HTTP, HTTPS, FTP, SMTP, DNS, SSH. User-facing protocols.
+Layer 6 Presentation: encryption, compression, data format conversion (SSL/TLS here conceptually).
+Layer 5 Session: establishing, managing, terminating sessions between applications.
+Layer 4 Transport: TCP, UDP. End-to-end communication, segmentation, flow control.
+Layer 3 Network: IP. Logical addressing (IP addresses), routing between networks.
+Layer 2 Data Link: MAC addresses, frames, error detection. Ethernet, Wi-Fi.
+Layer 1 Physical: bits, cables, fiber, radio waves, voltage levels.
+
+TCP/IP Model (practical, 4 layers):
+Application Layer: HTTP, DNS, FTP, SMTP, SSH.
+Transport Layer: TCP, UDP.
+Internet Layer: IP, ICMP, ARP.
+Network Access Layer: Ethernet, Wi-Fi, hardware.
+
+Encapsulation:
+Data travels down layers adding headers at each layer.
+Application data + HTTP header = HTTP message.
+HTTP message + TCP header = TCP segment.
+TCP segment + IP header = IP packet.
+IP packet + Ethernet header/trailer = Ethernet frame.
+Physical layer converts to bits.
+
+Decapsulation happens in reverse at receiver.
+
+CHAPTER 2: TCP AND UDP
+
+TCP (Transmission Control Protocol):
+Connection-oriented: requires handshake before data transfer.
+Reliable: guarantees delivery, ordering, no duplicates.
+Flow control: prevents overwhelming receiver. Sliding window protocol.
+Congestion control: prevents overwhelming network. Slow start, AIMD.
+Full-duplex: data flows both directions simultaneously.
+Use when: data integrity is critical. Web browsing, email, file transfer.
+
+TCP 3-Way Handshake (connection setup):
+Client sends SYN (synchronize) with initial sequence number.
+Server sends SYN-ACK (acknowledge + own synchronize).
+Client sends ACK. Connection established.
+
+TCP 4-Way Handshake (connection teardown):
+Either side sends FIN.
+Other side sends ACK.
+Other side sends FIN.
+First side sends ACK. Connection closed.
+
+TCP Sequence Numbers:
+Each byte has sequence number. Enables reordering and duplicate detection.
+Receiver sends ACK with next expected sequence number.
+Retransmit if ACK not received within timeout (RTO - Retransmission Timeout).
+
+TCP Flow Control (Sliding Window):
+Receiver advertises receive window size (how much buffer space available).
+Sender can send up to window size bytes without waiting for ACK.
+If window = 0, sender stops until receiver advertises nonzero window.
+
+TCP Congestion Control:
+Slow Start: begin with small window, double each RTT until threshold.
+Congestion Avoidance: linear increase (add 1 per RTT) after threshold.
+On packet loss: reduce window, restart slow start.
+Fast Retransmit: retransmit on 3 duplicate ACKs without waiting for timeout.
+
+UDP (User Datagram Protocol):
+Connectionless: no handshake. Just send packets.
+Unreliable: no delivery guarantee, no ordering, no duplicate elimination.
+No flow control, no congestion control.
+Much lower latency and overhead than TCP.
+Use when: speed matters more than reliability. Video streaming, gaming, DNS, VoIP.
+
+CHAPTER 3: HTTP AND WEB PROTOCOLS
+
+HTTP (HyperText Transfer Protocol):
+Application layer protocol for web. Request-response model.
+Client (browser) sends request. Server sends response.
+Stateless: each request is independent. No memory of previous requests.
+
+HTTP Request structure:
+Method URL HTTP-version
+Headers
+Empty line
+Body (optional)
+
+HTTP Methods:
+GET: retrieve resource. No body. Safe and idempotent. Cacheable.
+POST: submit data. Has body. Not idempotent. Create new resource.
+PUT: replace resource. Idempotent. Full update.
+PATCH: partial update. Not necessarily idempotent.
+DELETE: remove resource. Idempotent.
+HEAD: same as GET but no body. Check headers only.
+OPTIONS: check what methods server supports.
+
+HTTP Status Codes:
+1xx Informational: 100 Continue.
+2xx Success: 200 OK, 201 Created, 204 No Content.
+3xx Redirection: 301 Moved Permanently, 302 Found, 304 Not Modified.
+4xx Client Error: 400 Bad Request, 401 Unauthorized, 403 Forbidden, 404 Not Found, 429 Too Many Requests.
+5xx Server Error: 500 Internal Server Error, 502 Bad Gateway, 503 Service Unavailable, 504 Gateway Timeout.
+
+HTTP Headers:
+Content-Type: format of body (application/json, text/html, multipart/form-data).
+Authorization: credentials (Bearer token).
+Cache-Control: caching directives. no-cache, max-age=3600.
+Accept: what format client accepts. Accept-Language for language.
+Cookie: send cookies to server. Set-Cookie: server sets cookie on client.
+CORS headers: Access-Control-Allow-Origin for cross-origin requests.
+
+HTTP/1.1 vs HTTP/2 vs HTTP/3:
+HTTP/1.1: one request per connection (or pipelining, rarely used). Head-of-line blocking.
+HTTP/2: multiplexing (multiple requests on single connection). Header compression (HPACK). Server push. Binary protocol.
+HTTP/3: uses QUIC over UDP instead of TCP. No head-of-line blocking. Built-in TLS 1.3. Faster connection setup.
+
+Cookies and Sessions:
+Cookie: small piece of data stored in browser. Sent with every request to same domain.
+Session: server stores user data. Client has session ID in cookie.
+HttpOnly cookie: cannot be read by JavaScript (XSS protection).
+Secure cookie: only sent over HTTPS. SameSite prevents CSRF.
+
+REST vs GraphQL:
+REST: multiple endpoints, each returns fixed data structure. Simple, widely supported.
+GraphQL: single endpoint, client specifies exactly what data needed. Prevents over-fetching and under-fetching. More complex setup.
+
+CHAPTER 4: DNS AND ROUTING
+
+DNS (Domain Name System):
+Translates human-readable domain names to IP addresses.
+Distributed hierarchical database. No single point of failure.
+
+DNS Hierarchy:
+Root nameservers: 13 sets of servers. Know addresses of TLD nameservers.
+TLD nameservers: handle .com, .org, .in, etc. Know authoritative nameservers.
+Authoritative nameservers: have actual DNS records for domain.
+Resolver (Recursive nameserver): performs full resolution on behalf of client.
+
+DNS Resolution Steps:
+Browser checks local cache. OS checks hosts file. Query local resolver.
+Resolver checks cache. Queries root nameserver for TLD server address.
+Queries TLD nameserver for authoritative nameserver address.
+Queries authoritative nameserver for actual IP address.
+Returns IP to client. Cached at each step for TTL duration.
+
+DNS Record Types:
+A record: domain to IPv4 address.
+AAAA record: domain to IPv6 address.
+CNAME: domain to domain alias.
+MX: mail exchange server.
+TXT: text record (email verification, domain ownership).
+NS: nameserver record.
+SOA: start of authority, primary information about zone.
+
+TTL (Time To Live): how long to cache DNS record. Shorter = more fresh, more queries. Longer = fewer queries, stale data.
+
+IP Addressing:
+IPv4: 32-bit address. 4 octets: 192.168.1.1. About 4 billion addresses.
+IPv6: 128-bit address. 8 groups of 4 hex digits. Virtually unlimited addresses.
+Private ranges (not routable on internet): 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16.
+NAT (Network Address Translation): maps private IPs to public IP. Allows many devices to share one public IP.
+
+CIDR Notation:
+192.168.1.0/24 means first 24 bits are network address. Last 8 bits for hosts.
+/24 subnet has 256 addresses. /16 has 65536. /8 has 16 million.
+
+Routing:
+Process of selecting path for traffic in a network.
+Router: layer 3 device that forwards packets between networks.
+Routing table: maps destination IP ranges to next hop.
+Static routing: manually configured routes.
+Dynamic routing: routers exchange information. OSPF (within AS), BGP (between AS).
+
+BGP (Border Gateway Protocol):
+Inter-domain routing protocol. How internet routers communicate.
+ASN (Autonomous System Number): identifier for organization's network.
+BGP path attributes: AS-path, next-hop, local preference, MED.
+
+CHAPTER 5: SECURITY AND ENCRYPTION
+
+Cryptography Basics:
+Plaintext: original readable data. Ciphertext: encrypted data.
+Encryption: convert plaintext to ciphertext using key.
+Decryption: convert ciphertext back to plaintext using key.
+
+Symmetric Encryption:
+Same key for encryption and decryption.
+Fast. Problem: how to securely share key?
+Algorithms: AES (Advanced Encryption Standard, very secure and fast), DES (old, insecure), 3DES.
+AES key sizes: 128, 192, 256 bits. AES-256 used for most sensitive data.
+
+Asymmetric Encryption (Public Key Cryptography):
+Key pair: public key (share freely) and private key (keep secret).
+Encrypt with public key, only private key can decrypt.
+Sign with private key, anyone with public key can verify.
+Much slower than symmetric. Used for key exchange and digital signatures.
+Algorithms: RSA, Elliptic Curve Cryptography (ECC).
+
+TLS/SSL (Transport Layer Security):
+Provides encryption, authentication, integrity for network connections.
+HTTPS = HTTP over TLS.
+TLS handshake: negotiate protocol version, cipher suite, exchange keys.
+Uses asymmetric encryption for key exchange, symmetric for actual data (faster).
+Certificate Authority (CA) verifies server identity. Certificate contains public key.
+TLS 1.3 is current standard. SSL and TLS 1.0/1.1 are deprecated.
+
+HTTPS and Certificate Chain:
+Server presents SSL certificate. Browser verifies with CA.
+Chain of trust: server cert signed by intermediate CA signed by root CA.
+Root CAs pre-installed in browsers and OS.
+Certificate contains: domain name, public key, validity period, signature.
+
+Hashing:
+One-way function: easy to compute hash, impossible to reverse.
+Same input always produces same hash. Different inputs produce different hashes (collision resistance).
+MD5, SHA-1: deprecated (collision attacks found).
+SHA-256, SHA-3: secure modern algorithms.
+bcrypt, Argon2: for password hashing. Slow by design, includes salt.
+Salt: random data added to password before hashing. Prevents rainbow table attacks.
+
+OWASP Top 10 Security Risks:
+
+SQL Injection:
+Attacker inserts malicious SQL into input. Gets unauthorized data access.
+Prevention: use parameterized queries or prepared statements. NEVER concatenate user input into SQL.
+Example: username = "' OR '1'='1" could bypass login.
+
+Cross-Site Scripting (XSS):
+Attacker injects malicious JavaScript into web page. Runs in other users browsers.
+Stored XSS: script saved in database. Reflected XSS: script in URL.
+Prevention: escape user input in HTML context. Content Security Policy (CSP) header. HttpOnly cookies.
+
+Cross-Site Request Forgery (CSRF):
+Tricks user into making unintended request to site where they are logged in.
+Uses user's existing authentication (cookies).
+Prevention: CSRF tokens in forms. SameSite cookie attribute. Check Origin header.
+
+Authentication and Authorization:
+Authentication: verify identity (who are you?). Passwords, biometrics, OAuth.
+Authorization: verify permissions (what can you do?). RBAC, ABAC.
+OAuth 2.0: authorization framework. Let users grant third-party access without sharing password.
+JWT (JSON Web Tokens): stateless authentication. Signed tokens carry user info.
+Multi-Factor Authentication (MFA): something you know + have + are. Much more secure.
+
+Network Security:
+Firewall: filters network traffic based on rules. Block unauthorized access.
+VPN (Virtual Private Network): encrypted tunnel over public internet.
+IDS (Intrusion Detection System): monitors for suspicious activity.
+IPS (Intrusion Prevention System): actively blocks suspicious traffic.
+DDoS (Distributed Denial of Service): overwhelm server with traffic from many sources.
+Mitigations: CDN, rate limiting, traffic scrubbing, anycast routing.
+
+Security Best Practices:
+Always use HTTPS. Keep dependencies updated. Principle of least privilege.
+Never store passwords in plaintext. Use parameterized queries. Validate and sanitize all input.
+Implement proper error handling (do not leak sensitive info).
+Regular security audits and penetration testing.
